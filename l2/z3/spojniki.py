@@ -9,4 +9,5 @@ def check(sentence):
 
     return ans >=2
 
-print(filter(check))
+if __name__ == '__main__':
+    print(filter(check))

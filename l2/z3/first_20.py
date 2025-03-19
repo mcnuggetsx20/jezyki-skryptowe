@@ -11,5 +11,6 @@ def count(c=[0]):
 def check(sentence):
     return count() <= 20
 
-result = filter(check)
-print(result)
+if __name__ == '__main__':
+    result = filter(check)
+    print(result)
