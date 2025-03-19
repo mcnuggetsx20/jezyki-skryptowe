@@ -24,7 +24,7 @@ def filter(check_function) -> str:
                 temp_sentence += v
                 ###
 
-                print( [temp_sentence], hyphen)
+                # print( [temp_sentence], hyphen)
                 result += f'{temp_sentence}\n' * check_function(temp_sentence)
 
                 sentence = ''
