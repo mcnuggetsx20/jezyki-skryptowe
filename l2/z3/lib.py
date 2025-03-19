@@ -6,7 +6,7 @@ def filter(check_function) -> str:
     for line in stdin:
         
         for i,v in enumerate(line):
-            if v == '.' or v == '!' or v == '?':
+            if v == '.' or v == '!' or v == '?' or v == '…':
 
                 if len(sentence) == 0:
                     sentence = ''
@@ -24,8 +24,12 @@ def filter(check_function) -> str:
                 temp_sentence += v
                 ###
 
+
+                ### uznajemy ze fraza z jednym slowem nie moze byc zdaniem
                 # print( [temp_sentence], hyphen)
-                result += f'{temp_sentence}\n' * check_function(temp_sentence)
+                word_count = sentence.count(' ') + 1
+                if word_count >= 2:
+                    result += f'{temp_sentence}\n' * check_function(temp_sentence)
 
                 sentence = ''
 
