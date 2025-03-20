@@ -27,7 +27,7 @@ def filter(check_function) -> str:
 
                 ### uznajemy ze fraza z jednym slowem nie moze byc zdaniem
                 # print( [temp_sentence], hyphen)
-                word_count = sentence.count(' ') + 1
+                word_count = temp_sentence.count(' ') + 1
                 if word_count >= 2:
                     result += f'{temp_sentence}\n' * check_function(temp_sentence)
 
