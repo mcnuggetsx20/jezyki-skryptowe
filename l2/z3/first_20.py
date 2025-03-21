@@ -8,7 +8,7 @@ def count(c=[0]):
     c[0] += 1
     return c[0]
 
-def check(sentence):
+def check(_):
     return count() <= 20
 
 if __name__ == '__main__':
