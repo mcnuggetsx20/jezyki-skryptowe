@@ -1,6 +1,6 @@
 import sys
 
-def percentage_sentences_with_proper_names():
+def longest_sentence_diff_char():
     longest_sentence_length = 0
     longest_sentence = ''
     try:
@@ -40,4 +40,4 @@ def percentage_sentences_with_proper_names():
     return longest_sentence
 
 if __name__ == '__main__':
-     print(percentage_sentences_with_proper_names())
+     print(longest_sentence_diff_char())

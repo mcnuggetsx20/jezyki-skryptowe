@@ -4,7 +4,7 @@ def filter(check_function) -> str:
     sentence = ''
     result = ''
     for line in stdin:
-        
+        sentence = ''
         for i,v in enumerate(line):
             if v == '.' or v == '!' or v == '?' or v == '…':
 

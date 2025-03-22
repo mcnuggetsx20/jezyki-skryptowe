@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<indexing>
+ <object alt="" name="Obraz1" object_type="graphic"/>
+ <object alt="" name="Obraz2" object_type="graphic"/>
+ <object alt="" name="Obraz3" object_type="graphic"/>
+ <object alt="" name="Obraz4" object_type="graphic"/>
+ <object alt="" name="Obraz5" object_type="graphic"/>
+ <object alt="" name="Obraz6" object_type="graphic"/>
+ <object alt="" name="Obraz7" object_type="graphic"/>
+ <object alt="" name="Obraz8" object_type="graphic"/>
+ <object alt="" name="Obraz9" object_type="graphic"/>
+ <object alt="" name="Obraz10" object_type="graphic"/>
+ <object alt="" name="Obraz11" object_type="graphic"/>
+ <object alt="" name="Obraz12" object_type="graphic"/>
+ <object alt="" name="Obraz13" object_type="graphic"/>
+ <object alt="" name="Obraz14" object_type="graphic"/>
+ <object alt="" name="Obraz15" object_type="graphic"/>
+ <object alt="" name="Obraz16" object_type="graphic"/>
+ <object alt="" name="Obraz17" object_type="graphic"/>
+ <object alt="" name="Obraz19" object_type="graphic"/>
+ <object alt="" name="Obraz18" object_type="graphic"/>
+ <object alt="" name="Obraz20" object_type="graphic"/>
+ <object alt="" name="Obraz21" object_type="graphic"/>
+ <object alt="" name="Obraz22" object_type="graphic"/>
+ <object alt="" name="Obraz23" object_type="graphic"/>
+ <object alt="" name="Obraz24" object_type="graphic"/>
+ <object alt="" name="Obraz25" object_type="graphic"/>
+ <object alt="" name="Obraz26" object_type="graphic"/>
+ <object alt="" name="Obraz27" object_type="graphic"/>
+ <object alt="" name="Obraz28" object_type="graphic"/>
+ <object alt="" name="Obraz29" object_type="graphic"/>
+ <object alt="" name="Obraz30" object_type="graphic"/>
+ <paragraph index="99" node_type="writer">2.</paragraph>
+ <paragraph index="102" node_type="writer">3.a</paragraph>
+ <paragraph index="125" node_type="writer">3.b</paragraph>
+ <paragraph index="147" node_type="writer">3.c</paragraph>
+ <paragraph index="174" node_type="writer">3.d</paragraph>
+ <paragraph index="194" node_type="writer">3e.</paragraph>
+ <paragraph index="225" node_type="writer">3f.</paragraph>
+ <paragraph index="249" node_type="writer">3g.</paragraph>
+ <paragraph index="281" node_type="writer">3i.</paragraph>
+ <paragraph index="294" node_type="writer">3.j</paragraph>
+ <paragraph index="314" node_type="writer">3h</paragraph>
+ <paragraph index="320" node_type="writer">3k.</paragraph>
+ <paragraph index="341" node_type="writer">3l.</paragraph>
+ <paragraph index="363" node_type="writer">4. Wszystkie skrypty są wywoływane przy pomocy konstrukcji if __name__ == ‘__main__’.</paragraph>
+ <paragraph index="365" node_type="writer">5.</paragraph>
+</indexing>
