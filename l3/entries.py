@@ -17,9 +17,9 @@ def get_failed_reads(list, together=False):
     list_5 = []
     for kr in list:
         try:
-            if kr[0] == '4':
+            if kr[10][0] == '4':
                 list_4.append(kr)
-            if kr[0] == '5':
+            if kr[10][0] == '5':
                 if together:
                     list_4.append(kr)
                 else:
@@ -33,7 +33,7 @@ def get_failed_reads(list, together=False):
     
 def get_entires_by_extension(log_list, extens):
     logs_with_ext = []
-    for kr in list:
-        if str(kr[8]).endswith(extens):
+    for kr in log_list:
+        if str(kr[9]).endswith(extens):
             logs_with_ext.append(kr)
     return logs_with_ext

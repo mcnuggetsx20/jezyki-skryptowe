@@ -1,5 +1,6 @@
 import sys
 import datetime
+import entries
 
 def read_log():
     logs = []
@@ -18,4 +19,12 @@ def read_log():
     return logs
 
 if __name__ == '__main__':
-    print(read_log())
+    logs = read_log()
+    print(logs[:4])
+    print(entries.get_entires_by_extension(logs, '.jpg')[:4])
+    print('\n\n')
+    print(entries.get_failed_reads(logs, False)[1][:5])
+    print('\n\n')
+    print(entries.get_entries_by_code(logs, '404')[:5])
+    print('\n\n')
+    print(entries.get_entries_by_addr(logs, '192.168.202.79')[:5])
