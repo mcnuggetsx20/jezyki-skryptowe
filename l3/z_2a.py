@@ -1,5 +1,6 @@
 import sys
 import datetime
+import lib
 
 def read_log():
     logs = []
@@ -14,7 +15,11 @@ def read_log():
             logs.append(kr)
         except:
             continue
-    return logs
+    return logs[:10]
 
 if __name__ == '__main__':
-    print(read_log())
+    # print(lib.sort_log(read_log(), 0))
+    result = lib.sort_log(read_log(), 3)
+    for i in result:
+        print(i)
+
