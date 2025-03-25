@@ -11,3 +11,29 @@ def get_entries_by_code(list, code):
         if kr[10] == code:
             logs_with_code.append(kr)
     return logs_with_code
+
+def get_failed_reads(list, together=False):
+    list_4 = []
+    list_5 = []
+    for kr in list:
+        try:
+            if kr[0] == '4':
+                list_4.append(kr)
+            if kr[0] == '5':
+                if together:
+                    list_4.append(kr)
+                else:
+                    list_5.append(kr)
+        except:
+            continue
+    if together:
+        return list_4
+    else:
+        return list_4, list_5
+    
+def get_entires_by_extension(log_list, extens):
+    logs_with_ext = []
+    for kr in list:
+        if str(kr[8]).endswith(extens):
+            logs_with_ext.append(kr)
+    return logs_with_ext
