@@ -12,6 +12,7 @@ def entry_to_dict(entry):
         'method',
         'host',
         'uri',
+        'referrer',
     ]
     return dict(zip(keys, entry))
 
@@ -19,6 +20,7 @@ def log_to_dict(log):
     result = defaultdict(lambda: list())
 
     for entry in log:
+        print(entry)
         entry = entry_to_dict(entry)
         result[entry['uid']].append(entry)
         
@@ -29,6 +31,10 @@ def print_dict_entry_dates(dict_log):
 
     method_dict = defaultdict(lambda: 0)
     host_dict = defaultdict(lambda: 0)
+    code_dict = {
+            '2xx' : 0,
+            'other' : 0,
+            }
 
     for k, v in dict_log.items():
         print(k)
@@ -36,8 +42,13 @@ def print_dict_entry_dates(dict_log):
         num_queries = 0
         for dict_entry in v:
             print(dict_entry['host'], dict_entry['uri'])
+
             method_dict[dict_entry['method']] += 1
             host_dict[dict_entry['host']] += 1
+            
+            code = dict_entry['referrer']
+            index = '2xx' if (code[0]=='2' and len(code)==3) else 'other'
+            code_dict[index]+= 1
 
             num_queries += 1
 
@@ -53,6 +64,9 @@ def print_dict_entry_dates(dict_log):
     print("\nHOSTS:")
     for k, v in host_dict.items():
         print(f'{k}: {v}')
+
+    code_sum = sum(code_dict.values())
+    print(f"\n2xx/other: {code_dict['2xx'] / code_sum}")
 
 
 
