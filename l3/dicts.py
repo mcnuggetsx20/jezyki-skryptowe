@@ -12,7 +12,7 @@ def entry_to_dict(entry):
         'method',
         'host',
         'uri',
-        'referrer',
+        'status_code',
     ]
     return dict(zip(keys, entry))
 
@@ -46,7 +46,7 @@ def print_dict_entry_dates(dict_log):
             method_dict[dict_entry['method']] += 1
             host_dict[dict_entry['host']] += 1
             
-            code = dict_entry['referrer']
+            code = dict_entry['status_code']
             index = '2xx' if (code[0]=='2' and len(code)==3) else 'other'
             code_dict[index]+= 1
 
@@ -54,7 +54,7 @@ def print_dict_entry_dates(dict_log):
 
         sorted_by_date = sort_log(v, 'ts')
         print(f'number of queries: {num_queries}')
-        print(f'first: {sorted_by_date[0]['ts']} \nlast: {sorted_by_date[-1]['ts']}')
+        print(f'first: {sorted_by_date[0]["ts"]} \nlast: {sorted_by_date[-1]["ts"]}')
         print()
 
     method_sum = sum(method_dict.values())
