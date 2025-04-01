@@ -17,7 +17,7 @@ def read_log():
             try:
                 kr[10] = int(kr[10])
             except:
-                kr[10] = None
+                kr[10] = -1
             logs.append(tuple(kr))
         except Exception as e:
             print(e)
@@ -26,7 +26,7 @@ def read_log():
 
 if __name__ == '__main__':
     logs = read_log()
-    print(dicts.print_dict_entry_dates(dicts.log_to_dict(logs)))
+    print(lib.sort_log(logs,10))
     # print(dicts.entry_to_dict(logs[2]))
     print('\n\n')
     # print(dicts.entry_to_dict(logs[3]))
