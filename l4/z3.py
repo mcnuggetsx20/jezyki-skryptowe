@@ -9,8 +9,8 @@ def read_head(file, num_lines=10):
                 if not line:
                     break
                 print(line, end='')
-    except FileNotFoundError:
-        print(f"Błąd: Plik '{file}' nie istnieje.", file=sys.stderr)
+    except Exception as e:
+        print(e)
 
 def read_head_stdin(num_lines=10):
     for _ in range(num_lines):
@@ -29,8 +29,8 @@ def follow(file):
                     print(line, end='')
                 else:
                     time.sleep(1)
-    except FileNotFoundError:
-        print(f"Błąd: Plik '{file}' nie istnieje.", file=sys.stderr)
+    except Exception as e:
+        print(e)
 
 def main():
     args = sys.argv[1:]
