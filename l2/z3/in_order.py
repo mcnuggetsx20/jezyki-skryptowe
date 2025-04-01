@@ -8,7 +8,11 @@ def check(sentence):
     while len(sentence):
         i = sentence.find(' ')
         temp = sentence[:i].lower()
-        # print([last, temp])
+        if not temp: break
+
+        if temp[0] ==',': 
+            temp = temp[1:]
+        
 
         for j in range(min(len(temp), len(last))):
             if ord(last[j]) > ord(temp[j]):
