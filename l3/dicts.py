@@ -46,7 +46,7 @@ def print_dict_entry_dates(dict_log):
             method_dict[dict_entry['method']] += 1
             host_dict[dict_entry['host']] += 1
             
-            code = dict_entry['status_code']
+            code = str(dict_entry['status_code'])
             index = '2xx' if (code[0]=='2' and len(code)==3) else 'other'
             code_dict[index]+= 1
 
