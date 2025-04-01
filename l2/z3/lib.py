@@ -6,7 +6,7 @@ def filter(check_function) -> str:
     for line in stdin:
         sentence = ''
         for i,v in enumerate(line):
-            if v == '.' or v == '!' or v == '?' or v == '…':
+            if v == '.' or v == '!' or v == '?' or v == '…' or v=='\n':
 
                 if len(sentence) == 0:
                     sentence = ''

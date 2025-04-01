@@ -12,7 +12,7 @@ def first_sentence_with_subordinate_clauses(min_number_of_commas=3):
                             number_of_commas +=1
                         sentence += char
 
-                    if char == '.' or char == '!' or char == '?':
+                    if char == '.' or char == '!' or char == '?' or char=='\n':
                         if sentence_started:
                             if number_of_commas>=min_number_of_commas:
                                 return sentence

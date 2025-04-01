@@ -10,7 +10,7 @@ def read_head(file, num_lines=10):
                     break
                 print(line, end='')
     except Exception as e:
-        print(e)
+        raise e
 
 def read_head_stdin(num_lines=10):
     for _ in range(num_lines):
@@ -22,7 +22,6 @@ def read_head_stdin(num_lines=10):
 def follow(file):
     try:
         with open(file, 'r', encoding='utf-8') as f:
-            f.seek(0, 2)
             while True:
                 line = f.readline()
                 if line:
@@ -30,21 +29,22 @@ def follow(file):
                 else:
                     time.sleep(1)
     except Exception as e:
-        print(e)
+        raise e
 
 def main():
     args = sys.argv[1:]
     num_lines = 10
     follow_mode = False
     file_path = None
+    if (len(args)>3):
+        raise Exception("Zbyt wiele argumentow")
     
     for arg in args:
         if arg.startswith('--lines='):
             try:
                 num_lines = int(arg.split('=')[1])
-            except ValueError:
-                print("Błąd: Niepoprawna liczba w '--lines=n'", file=sys.stderr)
-                return
+            except Exception as e:
+                raise Exception("Liczba nie jest intem w --lines")
         elif arg == '--follow':
             follow_mode = True
         else:
