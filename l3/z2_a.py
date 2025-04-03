@@ -14,6 +14,10 @@ def read_log():
             kr[5] = int(kr[5])
             kr[6] = int(kr[6])
             kr[0] = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=float(kr[0]))
+            try:
+                kr[10] = int(kr[10])
+            except:
+                kr[10] = -1
             logs.append(tuple(kr))
         except Exception as e:
             print(e)
@@ -22,8 +26,7 @@ def read_log():
 
 if __name__ == '__main__':
     logs = read_log()
-    log_dict = dicts.log_to_dict(logs)
-    print(dicts.print_dict_entry_dates(log_dict))
+    print(lib.sort_log(logs,10))
     # print(dicts.entry_to_dict(logs[2]))
     print('\n\n')
     # print(dicts.entry_to_dict(logs[3]))
