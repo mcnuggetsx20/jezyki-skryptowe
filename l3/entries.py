@@ -17,9 +17,9 @@ def get_failed_reads(list, together=False):
     list_5 = []
     for kr in list:
         try:
-            if str(kr[10])[0] == '4':
+            if str(kr[10])[0] == '4' and len(str(kr[10]))==3:
                 list_4.append(kr)
-            if str(kr[10])[0] == '5':
+            if str(kr[10])[0] == '5'and len(str(kr[10]))==3:
                 if together:
                     list_4.append(kr)
                 else:
