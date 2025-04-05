@@ -1,6 +1,7 @@
 import sys
 import time
 
+# Reading head of the file
 def read_head(file, num_lines=10):
     try:
         with open(file, 'r', encoding='utf-8') as f:
@@ -12,6 +13,7 @@ def read_head(file, num_lines=10):
     except Exception as e:
         raise e
 
+# Reading head of stdin
 def read_head_stdin(num_lines=10):
     for _ in range(num_lines):
         line = sys.stdin.readline()
@@ -19,6 +21,7 @@ def read_head_stdin(num_lines=10):
             break
         print(line, end='')
 
+# Folowing file
 def follow(file):
     try:
         with open(file, 'r', encoding='utf-8') as f:
