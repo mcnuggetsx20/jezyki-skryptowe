@@ -74,6 +74,8 @@ if __name__ == '__main__' and len(argv) >= 2:
             target_format = target_format_for_image
         else:
             print(f'Ścieżka nie jest audio: {filename}')
+            continue
+
         # Making log
         if result.returncode == 0:
             log_to_json(
