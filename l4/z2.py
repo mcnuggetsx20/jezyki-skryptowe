@@ -15,18 +15,16 @@ def list_executables():
                 files = os.listdir(directory)
                 executables = [f for f in files if os.path.isfile(os.path.join(directory, f)) and os.access(os.path.join(directory, f), os.X_OK)]
                 for exe in executables:
-                    print(f"  {exe}")
+                    print(f"\t{exe}")
             except:
                 continue
             print()
 
-def main():
+
+if __name__ == "__main__":
     args = sys.argv[1:]
     
     if "--directories" in args:
         list_path_directories()
     if "--executables" in args:
         list_executables()
-
-if __name__ == "__main__":
-    main()

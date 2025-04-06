@@ -7,7 +7,7 @@ def analyze_file(file_path, with_counter=False):
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
-    except FileNotFoundError:
+    except:
         raise Exception("File not found")
     
     char_count = len(content)

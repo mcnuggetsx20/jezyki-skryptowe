@@ -10,13 +10,11 @@ def filter_env_variables(filters):
         if any(f in key for f in filters):
             print(f"{key}={os.environ[key]}")
 
-def main():
+
+if __name__ == "__main__":
     args = sys.argv[1:]
     
     if not args:
         list_env_variables()
     else:
         filter_env_variables(args)
-
-if __name__ == "__main__":
-    main()

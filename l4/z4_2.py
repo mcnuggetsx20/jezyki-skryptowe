@@ -48,8 +48,8 @@ def main(directory):
     all_chars = Counter()
     all_words = Counter()
     for r in results:
-        all_chars.update(r["most_common_char"]) 
-        all_words.update(r["most_common_word"])
+        all_chars.update(r["most_common_chars_counter"]) 
+        all_words.update(r["most_common_words_counter"])
     most_common_char = all_chars.most_common(1)[0][0]
     most_common_word = all_words.most_common(1)[0][0]
     # Printing every data
