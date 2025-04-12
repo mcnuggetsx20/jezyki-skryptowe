@@ -1,4 +1,5 @@
 import re
+import lib
 
 dates = []
 lat_lon = []
@@ -9,12 +10,7 @@ three_piece = []
 addr_with_comma = []
 
 comma_pattern = r',(?=(?:[^"]*"[^"]*")*[^"]*$)'
-split_pattern = r'\n(?=(?:[^"]*"[^"]*")*[^"]*$)'
-
-file = open('stacje.csv', 'r')
-filedata = file.read().strip()
-filedata = re.split(split_pattern, filedata)
-file.close()
+filedata = lib.read_stations()
 
 headers = [i for i in re.split(comma_pattern, filedata[0].strip())]
 
@@ -24,7 +20,7 @@ for line in filedata[1:]:
 
     lat_lon.extend(re.findall(r'\d{2}\.\d{6}', line))
 
-    stations.extend(re.findall(r'\b\w+\b\s*-\s*\b\w+\b', line))
+    stations.extend(re.findall(r'\b[^\d\s,"]+\b\s*-\s*\b[^\d\s,"]+\b', line))
 
     # WOW
     values = re.split(comma_pattern, line.strip()) 
