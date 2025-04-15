@@ -52,16 +52,16 @@ for station in stations:
     stations_processed.append(processed_line)
         
 if __name__ == '__main__':
-    # print(dates)
-    # print(lat_lon)
-    # print(stations)
-    # print(stations_processed)
-    # if immobile:
-    #     print(f'podp. e): NIE {immobile}')
-    # else: 
-    #     print('podp. e): TAK')
-    # print(three_piece)
-    # print(len(addr_with_comma))
+    print(dates[:2])
+    print(lat_lon[:2])
+    print(stations[:2])
+    print(stations_processed[:2])
+    if immobile:
+        print(f'podp. e): NIE {immobile}')
+    else: 
+        print('podp. e): TAK')
+    print(three_piece[:2])
+    print(len(addr_with_comma))
     pass
 
 
