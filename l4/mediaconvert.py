@@ -31,7 +31,11 @@ def log_to_json(history_folder, og_path, output_format, output_path, program):
 if __name__ == '__main__' and len(argv) >= 2:
     # Getting all files from directory
     folder = argv[1]
-    files = [path.join(folder, file) for file in listdir(folder)]
+    try:
+        files = [path.join(folder, file) for file in listdir(folder)]
+    except PermissionError as e:
+        raise e
+
     # Getting types of files from arguments
     target_format_for_audio = next((f.split('=')[-1] for f in argv if f.startswith('--audio')), (print('Using mp4') or 'mp4'))
     target_format_for_image = next((f.split('=')[-1] for f in argv if f.startswith('--image')), (print('Using png') or 'png'))
