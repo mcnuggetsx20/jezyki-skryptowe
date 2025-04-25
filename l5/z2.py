@@ -16,4 +16,5 @@ def group_measurement_files_by_key(path: Path) -> Dict[Tuple[str, str, str], Pat
     return grouped_files
 
 if __name__ == '__main__':
-    print(group_measurement_files_by_key(Path('data/measurements')))
+    path = input("Podaj sciezke: ")
+    print(group_measurement_files_by_key(Path(path)))

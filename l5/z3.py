@@ -16,7 +16,7 @@ def get_addresses(path: Path, city: str) -> List[Tuple[str, str, str, str]]:
                 miasto = row[11].strip()
                 adres = row[12].strip()
 
-                m = re.match(r'((ul|al|pl)\.\s+[^\d,]+)\s*(\d[\dA-Za-z/]*)?', adres)
+                m = re.match(r'((ul|al|pl)\.\s+[^\d,]+)\s*(\d+)?', adres)
                 if m:
                     ulica = m.group(1).strip()
                     numer = m.group(2) or ''
