@@ -56,7 +56,7 @@ def parse_dane(metadane_path, folder_pomiarów):
     return stacje
 
 if __name__ == '__main__':
-    dane = parse_dane('data/stacje.csv', 'data/measurements/')
+    dane = parse_dane('datay/stacje.csv', 'data/measurements/')
     print(dane['DsBialka'])
     print(dane['DsBielGrot'])
     print(dane['DsBogatFrancMOB'])

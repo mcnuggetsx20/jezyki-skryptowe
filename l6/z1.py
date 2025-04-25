@@ -42,14 +42,25 @@ class Station:
 
 if __name__ == '__main__':
     filedata = lib.read_stations()
+    print(filedata[3])
+    
+    print(filedata[4])
     args1 = lib.split_line(filedata[3])
     args2 = lib.split_line(filedata[4])
 
     st1 = Station(*args1)
     st2 = Station(*args2)
-
+    print(st1 == st2)
     st2.kod_stacji = st1.kod_stacji
     print(st1 == st2)
+    print('\n\n')
+    print(str(st1))
+    print('\n\n')
+    print(str(st2))
+    print('\n\n')
+    print(repr(st1))
+    print('\n\n')
+    print(repr(st2))
 
 
 

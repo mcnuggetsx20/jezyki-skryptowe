@@ -4,7 +4,11 @@ import os
 from typing import List
 from datetime import datetime
 import csv
-from z2 import TimeSeries
+from z2_3 import TimeSeries
+from z4 import ZeroSpikeDetector
+from z4 import OutlierDetector
+from z4 import ThresholdDetector
+from z4 import CompositeValidator
 
 class Measurements:
     def __init__(self, directory : str):
@@ -17,7 +21,7 @@ class Measurements:
             if match:
                 year, measurement, frequency = match.groups()
                 key = (year, measurement, frequency)
-                self.files[key] = {"filename":os.path.join(self.directory, file),
+                self.files[key] = {"filename": file,
                                    "is_loaded": False,
                                    "TimeSeries": []}
 
@@ -34,25 +38,29 @@ class Measurements:
         for file_key in self.files:
             _, measurement, _ = file_key
             if measurement == param_name:
-                matching_series.append(self.load_data(file_key)["TimeSeries"])
+                matching_series.extend(self.load_data(file_key)["TimeSeries"])
         return matching_series
 
     def get_by_station(self, station_code: str) -> List:
         matching_series = []
         for file_key in self.files:
             year, measurement, frequency = file_key
-            file_path = self.files[file_key]
+            file_path = self.files[file_key]["filename"]
             with open(file_path, newline='', encoding='utf-8') as csvfile:
                 reader = csv.reader(csvfile)
-                headers = next(reader)  
-                if station_code in headers:
-                    matching_series.append(self.load_data(file_key)["TimeSeries"])
+                next(reader)
+                station_codes = next(reader)[1:]   
+                if station_code in station_codes:
+                    time_series_data = self.load_data(file_key)["TimeSeries"]
+                    for ts in time_series_data:
+                        if ts.station_code == station_code:
+                            matching_series.append(ts)
         return matching_series
 
     def load_data(self, file_key) -> List[tuple]:
         if not self.files[file_key]["is_loaded"]:
             self.files[file_key]["is_loaded"] = True
-            with open(self.file_path, newline='', encoding='utf-8') as f:
+            with open(self.files[file_key]["filename"], newline='', encoding='utf-8') as f:
                 reader = csv.reader(f)
                 rows = list(reader)
                 
@@ -65,7 +73,10 @@ class Measurements:
                     self.files[file_key]["TimeSeries"].append( TimeSeries(indicators[i], station_code[i], avereging_time[i],[],[],unit[i]))
 
                 for row in rows[6:]:
-                    date = datetime.strptime(row[0], "%m/%d/%y %H:%M")
+                    try:
+                        date = datetime.strptime(row[0], "%m/%d/%y %H:%M")
+                    except ValueError:
+                        continue 
                     for i in range(1, len(row)):  
                         try:
                             value = float(row[i]) if row[i] != '' else None
@@ -105,4 +116,26 @@ class Measurements:
 
         return result
 
+if __name__ == '__main__':
+    ms = Measurements("data/measurements")
+    print(len(ms))
+    print(ms.get_by_parameter('NO')[1].indicator_name)
+
+    print('\n Walidation test')
+    zero = ZeroSpikeDetector()
+    threshold = ThresholdDetector(10)
+    outlier = OutlierDetector(1)
+    composite = CompositeValidator([zero,threshold])
+    print(ms.detect_all_anomalies([zero, threshold, outlier, composite], False))
+
+    # print(ms.get_by_parameter('PM25')[1].indicator_name)
+    # print(ms.get_by_parameter('PM10')[1].indicator_name)
+# 
+# 
+    # print('\n Station test')
+    # print(ms.get_by_station("DsLegAlRzecz")[1].station_code)
+    # print(ms.get_by_station("KpNaklWawrzy")[0].station_code)
+    # print(ms.get_by_station("DsWrocWybCon")[0].station_code)
+
+    
 
