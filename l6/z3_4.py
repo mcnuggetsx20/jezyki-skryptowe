@@ -2,7 +2,6 @@ from z2 import TimeSeries
 from abc import ABC, abstractmethod
 import numpy as np
 from typing import List
-from datetime import datetime
 
 class SeriesValidator(ABC):
     @abstractmethod
