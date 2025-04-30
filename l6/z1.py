@@ -52,15 +52,11 @@ if __name__ == '__main__':
     st2 = Station(*args2)
     print(st1 == st2)
     st2.kod_stacji = st1.kod_stacji
-    print(st1 == st2)
-    print('\n\n')
-    print(str(st1))
-    print('\n\n')
-    print(str(st2))
-    print('\n\n')
-    print(repr(st1))
-    print('\n\n')
-    print(repr(st2))
+    print(st1 == st2, end = 4 * '\n')
+    print(str(st1), end = 4*'\n')
+    print(str(st2), end = 4*'\n')
+    print(repr(st1), end = 4*'\n')
+    print(repr(st2), end = 4*'\n')
 
 
 
