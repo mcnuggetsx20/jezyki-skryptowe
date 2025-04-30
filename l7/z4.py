@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 def make_generator(func):
     def generator(bound):
         i = 1
@@ -6,6 +8,13 @@ def make_generator(func):
             i +=1
 
     return generator
+
+#(TODO) upewnic sie ze chodzi o to co mysle
+#w tym zadaniu 5
+@lru_cache(maxsize=None)
+def make_generator_mem(func):
+    gen = make_generator(func)
+    return lambda bound: gen(bound)
 
 def fib(n):
     a, b = 0, 1
