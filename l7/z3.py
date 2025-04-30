@@ -22,3 +22,8 @@ class PasswordGenerator:
 
         self.current +=1
         return new_password
+
+if __name__ == '__main__':
+    pg = PasswordGenerator(10, [], 3)
+    for i in pg: print(i)
+
