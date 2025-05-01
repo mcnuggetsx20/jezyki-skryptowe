@@ -6,17 +6,14 @@ def log(log_level):
     def make_decorator(obj):
         logger = getLogger("wrapper_logger")
         logger.setLevel(DEBUG)
-        logger.addHandler(StreamHandler(stdout))
+        if not logger.handlers: logger.addHandler(StreamHandler(stdout))
         log_dict = dict()
 
-        
         if isinstance(obj, type):
             old_init = obj.__init__
-            print('aa')
             def new_init(self, *args, **kwargs):
-                print('elo')
-                # logger.log(log_level, "Zainicjowano instancje klasy")
                 old_init(self, *args, **kwargs)
+                logger.log(log_level, "Zainicjowano instancje klasy")
                 return
             
             obj.__init__ = new_init
@@ -54,5 +51,6 @@ class Test:
         return
 
 if __name__ == '__main__':
-    t = Test()
+    Test()
+    pass
 
