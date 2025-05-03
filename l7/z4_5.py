@@ -21,8 +21,11 @@ def fib(n):
     return fib(n-1) + fib(n-2)
 
 if __name__ == '__main__':
+    from time import time
     fgen = make_generator(fib)
-    print([i for i in fgen(10)])
+    start = time()
+    print([i for i in fgen(25)])
+    print(time()-start)
 
     gen1 = make_generator(lambda n: 2*n)
     gen2 = make_generator(lambda n: 3**n * 2)
@@ -30,6 +33,11 @@ if __name__ == '__main__':
 
     print([i for i in gen1(5)])
     print([i for i in gen2(5)])
-    print([i for i in gen3(10)])
+    start = time()
+    print([i for i in gen3(25)])
+    print(time()-start)
+    start = time()
+    print([i for i in gen3(25)])
+    print(time()-start)
 
 
