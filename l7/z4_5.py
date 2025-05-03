@@ -26,8 +26,10 @@ if __name__ == '__main__':
 
     gen1 = make_generator(lambda n: 2*n)
     gen2 = make_generator(lambda n: 3**n * 2)
+    gen3 = make_generator_mem(fib)
 
     print([i for i in gen1(5)])
     print([i for i in gen2(5)])
+    print([i for i in gen3(10)])
 
 

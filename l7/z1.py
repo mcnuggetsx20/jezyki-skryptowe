@@ -69,3 +69,4 @@ if __name__ == '__main__':
     print(make_alpha_dict('ona i on'))
     print(flatten([1, [2, 3], [[4, 5], 6]]))
     print(flatten([[[[2,[[]]],[]]]]))
+

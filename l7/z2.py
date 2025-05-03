@@ -1,43 +1,46 @@
 from collections.abc import Iterable
 
-def count_matching(pred, tab):
+def count_matching(pred, tab, lo=0, hi=0, check_all=False):
     if not hasattr(tab, '__len__'):
         raise Exception('Invalid Input')
 
     ans = 0
     def aux(tab):
-        nonlocal ans
+        nonlocal ans,lo, hi
+        if lo and lo == ans: return
+        if hi and hi < ans: return
+
         match tab:
             case []: return
             case [head, *tail]:
-                match pred(head):
-                    case True: 
-                        ans += 1
-                        aux(tail)
 
-                    case False: aux(tail)
+                res = pred(head)
+                if not res and check_all:
+                    return 
+
+                ans += res
+                aux(tail)
     aux(tab)
-    return ans
+    if check_all:
+        return ans ==len(tab)
+
+    if lo and hi: return lo <= ans <= hi
+    elif lo: return lo <= ans
+    elif hi: return ans <= hi
+    elif check_all: return ans == len(tab)
+    else: return ans
 
 def forall(pred, tab : Iterable):
-    if not hasattr(tab, '__len__'):
-        raise Exception('Invalid Input')
-
-    match tab:
-        case []: return True
-        case [head, *tail]:
-            match pred(head):
-                case False: return False
-                case True: return forall(pred, tail)
+    return count_matching(pred, tab, check_all=True)
 
 def exists(pred, tab : Iterable):
-    return count_matching(pred,tab) >= 1
+    return count_matching(pred,tab, lo=1)
 
 def atleastn(n, pred, tab : Iterable):
-    return count_matching(pred,tab) >= n
+    return count_matching(pred,tab,lo=n)
 
 def atmost(n, pred, tab : Iterable):
-    return count_matching(pred,tab) <= n
+    return count_matching(pred,tab,hi=n)
 
 if __name__ == '__main__':
     print(forall(lambda x: x < 10, [1, 10,11,12]))

@@ -24,6 +24,19 @@ class PasswordGenerator:
         return new_password
 
 if __name__ == '__main__':
-    pg = PasswordGenerator(10, [], 3)
-    for i in pg: print(i)
+    pg1 = PasswordGenerator(10, [], 3)
+    pg2 = PasswordGenerator(5, ['a','b','c','5','1','2'], 0)
+    pg3 = PasswordGenerator(25, ['a','b','c','5','1','2'], 2)
+    pg4 = PasswordGenerator(10, ['$', '!', '#', '5'], 3)
+
+    def test(tests):
+        for num, gen in enumerate(tests):
+            print(f'{num+1}:')
+            for i in gen: print(f'\t{i}')
+            print()
+        return
+
+    test([pg1,pg2,pg3,pg4])
+
+
 
