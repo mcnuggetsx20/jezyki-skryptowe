@@ -1,9 +1,9 @@
 from collections.abc import Iterable
 
-#(TODO) dodac obsluge nieskonczonych sekwencji
-# czyli takich co nie maja len()
-
 def count_matching(pred, tab):
+    if not hasattr(tab, '__len__'):
+        raise Exception('Invalid Input')
+
     ans = 0
     def aux(tab):
         nonlocal ans
@@ -20,6 +20,9 @@ def count_matching(pred, tab):
     return ans
 
 def forall(pred, tab : Iterable):
+    if not hasattr(tab, '__len__'):
+        raise Exception('Invalid Input')
+
     match tab:
         case []: return True
         case [head, *tail]:
@@ -40,4 +43,6 @@ if __name__ == '__main__':
     print(forall(lambda x: x < 10, [1, 10,11,12]))
     print(exists(lambda x: x < 10, [1, 10,11,12]))
     print(atleastn(2, lambda x: x < 10, [1, 10,11,12]))
+    print(atmost(2, lambda x: x < 10, [1, 10,11,12]))
+    print(forall(lambda x: x < 10, range(0,100)))
 

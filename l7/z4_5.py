@@ -9,18 +9,16 @@ def make_generator(func):
 
     return generator
 
-#(TODO) upewnic sie ze chodzi o to co mysle
-#w tym zadaniu 5
-@lru_cache(maxsize=None)
 def make_generator_mem(func):
-    gen = make_generator(func)
+
+    mem_func = lru_cache()(func)
+
+    gen = make_generator(mem_func)
     return lambda bound: gen(bound)
 
 def fib(n):
-    a, b = 0, 1
-    for _ in range(n-1):
-        a, b = b, a+b
-    return a
+    if n <= 1: return n
+    return fib(n-1) + fib(n-2)
 
 if __name__ == '__main__':
     fgen = make_generator(fib)

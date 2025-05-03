@@ -1,13 +1,15 @@
 from collections.abc import Sequence
 
-
-#(TODO) potencjalnie trzeba zmienic to odwracanie tekstu
-def odwr(text : str):
-    match text:
-        case '': return ''
-        case _: return text[-1] + odwr(text[:-1])
+def odwr(text : str) -> str:
+    match list(text):
+        case []: return ''
+        case [head, *tail]: 
+            return odwr(''.join(tail)) + head
+        case _:
+            raise Exception('Invalid text')
 
 def most_common_element(tab : list):
+    if not tab: return None
     def aux(tab: list, dc : dict):
         match tab:
             case []: return dc
@@ -59,9 +61,11 @@ def flatten(x):
                 case [head, *tail]:
                     return flatten(head) + flatten(tail)
 
-
 if __name__ == '__main__':
+    print(odwr('To jest tekst do odwrocenia'))
     print(most_common_element([2,2,10]))
+    print(most_common_element([]))
     print(newt(49, 0.1))
     print(make_alpha_dict('ona i on'))
     print(flatten([1, [2, 3], [[4, 5], 6]]))
+    print(flatten([[[[2,[[]]],[]]]]))
