@@ -1,7 +1,7 @@
 from collections import defaultdict
 
-def entry_to_dict(entry):
-    keys = [
+def get_keys():
+    return [
         'ts',
         'uid',
         'id.orig_h',
@@ -14,7 +14,18 @@ def entry_to_dict(entry):
         'uri',
         'status_code',
     ]
+
+def entry_to_dict(entry):
+    keys = get_keys()
     return dict(zip(keys, entry))
+
+def log_to_dict_list(log):
+    result = list()
+
+    for entry in log:
+        result.append(entry_to_dict(entry))
+        
+    return result
 
 def log_to_dict(log):
     result = defaultdict(lambda: list())
