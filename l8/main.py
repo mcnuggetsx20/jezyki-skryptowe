@@ -2,6 +2,7 @@ import tkinter
 from tkinter import filedialog
 from tkinter import ttk
 from l3 import lib,dicts
+import datetime
 
 class App:
 
@@ -21,6 +22,7 @@ class App:
         self.file_data = None
         self.current_linenr = None
         self.detail_vars = []
+
 
         ## HEADER
         self.header_frame = tkinter.Frame(self.root)
@@ -62,6 +64,9 @@ class App:
         self.nav_frame.grid(row=0, column=2, sticky='ns')
         ##
 
+        self.date_from=None
+        self.date_to = None
+
 
         return
 
@@ -98,6 +103,7 @@ class App:
         strings = []
         for num, line in enumerate(log):
             new_line = _filter(line)
+            if new_line is None: continue
             strings.append(';'.join([str(i) for i in new_line])[:max_chars]+'...')
 
         self.clear_text_field()
@@ -141,6 +147,15 @@ class App:
         tkinter.Button(self.nav_frame, text='<-', command=lambda: self.next_log(dir=-1)).grid(row=len(self.detail_vars)-1, column = 5)
         tkinter.Button(self.nav_frame, text='->', command=lambda: self.next_log(dir=1)).grid(row=len(self.detail_vars)-1, column = 6)
 
+        self.date_from = tkinter.Entry(self.nav_frame)
+        self.date_to = tkinter.Entry(self.nav_frame)
+
+        self.date_from.bind("<Return>", lambda event: self.parse_date(event, start=-1))
+        self.date_to.bind("<Return>", lambda event: self.parse_date(event, start=1))
+
+        self.date_from.grid(row = len(self.detail_vars), column=5)
+        self.date_to.grid(row = len(self.detail_vars)+1, column=5)
+
         return
 
     def display_details(self, linenr = None):
@@ -165,6 +180,33 @@ class App:
         self.current_linenr += dir
         self.display_details(self.current_linenr)
         self.highlight_line(self.current_linenr+1, reset=True)
+        return
+
+    def parse_date(self, event= None, start=0):
+        to = self.date_to.get()
+        fr = self.date_from.get()
+
+        if not to or not fr:
+            self.display_log()
+
+        # to = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=float(to))
+        # fr = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=float(fr))
+
+        to = datetime.datetime.strptime(to, "%Y-%m-%d")
+        fr = datetime.datetime.strptime(fr, "%Y-%m-%d")
+
+        def f(line):
+            temp = dicts.entry_to_dict(line)
+            curr_ts = temp['ts']
+            print(fr, curr_ts, to)
+            if fr <= curr_ts <= to: 
+                print('ret')
+                return line
+
+            else: return None
+
+        self.display_log(_filter=f)
+
         return
 
     def run(self):
