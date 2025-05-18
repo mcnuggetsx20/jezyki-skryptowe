@@ -145,11 +145,11 @@ def create_dummy_series():
     SimpleReporter()
 
 ])
-def test_detect_all_anomalies_with_mock(monkeypatch, validator : List):
+def test_detect_all_anomalies_with_mock(monkeypatch, validator) -> None:
     ms = Measurements(None)
     dummy_key = ("2024", "PM10", "1h")
     ms.files[dummy_key] = {
-        "filename": None,
+        "filename": Path(''),
         "is_loaded": True,
         "TimeSeries": []  
     }
@@ -165,8 +165,8 @@ def test_detect_all_anomalies_with_mock(monkeypatch, validator : List):
     messages = series[0]["anomalies"]
     helper : int = 0
     for i in range (len(dummy_ts)):
-        helper = validator.analyze(dummy_ts[i])
-    assert len(messages) != helper
+        helper = len(validator.analyze(dummy_ts[i]))
+    assert len(messages) == helper
     for m in messages:
         assert hasattr(m, "strip") 
         assert len(m.strip()) > 0
