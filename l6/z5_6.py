@@ -1,20 +1,30 @@
 from pathlib import Path
 import re
 import os
-from typing import List
-from datetime import datetime
+from typing import List, TypedDict, Optional, Sequence
+from datetime import datetime, timedelta
 import csv
 from z2_3 import TimeSeries
 from z4 import ZeroSpikeDetector
 from z4 import OutlierDetector
 from z4 import ThresholdDetector
 from z4 import CompositeValidator
+from z4 import SeriesValidator
+from z8 import SimpleReporter
+
+class FileInfo(TypedDict):
+    filename: Path
+    is_loaded: bool
+    TimeSeries: List[TimeSeries]
+
 
 class Measurements:
-    def __init__(self, directory : str):
-        self.directory = directory
-        self.files = {}
-        self.possibleTimeSeries = None
+    def __init__(self, directory : Optional[str]) -> None:
+        self.files : dict[tuple[str,str,str], FileInfo] = {}
+        self.possibleTimeSeries : Optional[int] = None
+        if not directory:
+            return
+        self.directory : str = directory
         for file in Path(directory).iterdir():
             pattern = re.compile(r'(\d{4})_(\w+)_(\d\w*)\.csv$')
             match = pattern.match(file.name)
@@ -25,7 +35,7 @@ class Measurements:
                                    "is_loaded": False,
                                    "TimeSeries": []}
 
-    def __len__(self):
+    def __len__(self) -> int:
         if self.possibleTimeSeries is None:
             self.possibleTimeSeries = 0
             for file_key in self.files:
@@ -33,16 +43,16 @@ class Measurements:
                     self.possibleTimeSeries += len(csvfile.readline().split(',')) - 1 
         return self.possibleTimeSeries
 
-    def get_by_parameter(self, param_name: str) -> List:
-        matching_series = []
+    def get_by_parameter(self, param_name: str) -> List[TimeSeries]:
+        matching_series : List[TimeSeries] = []
         for file_key in self.files:
             _, measurement, _ = file_key
             if measurement == param_name:
                 matching_series.extend(self.load_data(file_key)["TimeSeries"])
         return matching_series
 
-    def get_by_station(self, station_code: str) -> List:
-        matching_series = []
+    def get_by_station(self, station_code: str) -> List[TimeSeries]:
+        matching_series : List[TimeSeries] = []
         for file_key in self.files:
             year, measurement, frequency = file_key
             file_path = self.files[file_key]["filename"]
@@ -57,7 +67,7 @@ class Measurements:
                             matching_series.append(ts)
         return matching_series
 
-    def load_data(self, file_key) -> List[tuple]:
+    def load_data(self, file_key : tuple[str,str,str]) -> FileInfo:
         if not self.files[file_key]["is_loaded"]:
             self.files[file_key]["is_loaded"] = True
             with open(self.files[file_key]["filename"], newline='', encoding='utf-8') as f:
@@ -88,17 +98,17 @@ class Measurements:
                     
         return self.files[file_key]
     
-    def detect_all_anomalies(self, validators: list, preload: bool = False) -> dict:
-        result = {}
+    def detect_all_anomalies(self, validators: list[SeriesValidator], preload: bool = False) -> dict[tuple[str, str, str], list[dict[str, Sequence[str]]]]:
+        result : dict[tuple[str,str,str], list[dict[str, Sequence[str]]]]= {}
 
         for file_key in self.files:
             if preload or self.files[file_key]["is_loaded"]:
-                anomalies_by_series = []
+                anomalies_by_series : List[dict[str,Sequence[str]]] = []
 
                 time_series_list = self.load_data(file_key)["TimeSeries"]
 
                 for ts in time_series_list:
-                    anomalies = []
+                    anomalies : List[str] = []
                     for validator in validators:
                         anomalies.extend(validator.analyze(ts))
 
@@ -116,26 +126,50 @@ class Measurements:
 
         return result
 
-if __name__ == '__main__':
-    ms = Measurements("data/measurements")
-    print(len(ms))
-    print(ms.get_by_parameter('NO')[1].indicator_name)
+import pytest
 
-    print('\n Walidation test')
-    zero = ZeroSpikeDetector()
-    threshold = ThresholdDetector(10)
-    outlier = OutlierDetector(1)
-    composite = CompositeValidator([zero,threshold])
-    print(ms.detect_all_anomalies([zero, threshold, outlier, composite], False))
 
-    # print(ms.get_by_parameter('PM25')[1].indicator_name)
-    # print(ms.get_by_parameter('PM10')[1].indicator_name)
-# 
-# 
-    # print('\n Station test')
-    # print(ms.get_by_station("DsLegAlRzecz")[1].station_code)
-    # print(ms.get_by_station("KpNaklWawrzy")[0].station_code)
-    # print(ms.get_by_station("DsWrocWybCon")[0].station_code)
+
+
+def create_dummy_series():
+    ts = TimeSeries("PM10", "ST01", "1h", [], [], "µg/m3")
+    start = datetime(2024, 1, 1, 0, 0)
+    ts.dates = [start + timedelta(hours=i) for i in range(4)]
+    ts.values = [0, 0.0, 0.0, 0.0] 
+    return [ts]
+
+
+@pytest.mark.parametrize("validator", [
+    ZeroSpikeDetector(),
+    OutlierDetector(k=2.0),
+    SimpleReporter()
+
+])
+def test_detect_all_anomalies_with_mock(monkeypatch, validator) -> None:
+    ms = Measurements(None)
+    dummy_key = ("2024", "PM10", "1h")
+    ms.files[dummy_key] = {
+        "filename": Path(''),
+        "is_loaded": True,
+        "TimeSeries": []  
+    }
+
+    dummy_ts = create_dummy_series()
+    monkeypatch.setattr(ms, "load_data", lambda key: {"TimeSeries": dummy_ts})
+
+    results = ms.detect_all_anomalies([validator], preload=True)
+
+    series = results[dummy_key]
+
+    assert len(series) == 1
+    messages = series[0]["anomalies"]
+    helper : int = 0
+    for i in range (len(dummy_ts)):
+        helper = len(validator.analyze(dummy_ts[i]))
+    assert len(messages) == helper
+    for m in messages:
+        assert hasattr(m, "strip") 
+        assert len(m.strip()) > 0
 
     
 

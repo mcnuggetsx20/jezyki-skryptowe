@@ -22,6 +22,7 @@ class App:
         self.file_data = None
         self.current_linenr = None
         self.detail_vars = []
+        self.filtred_data = []
 
 
         ## HEADER
@@ -64,8 +65,8 @@ class App:
         self.nav_frame.grid(row=0, column=2, sticky='ns')
         ##
 
-        self.date_from=None
-        self.date_to = None
+        self.date_from=""
+        self.date_to = ""
 
 
         return
@@ -84,30 +85,18 @@ class App:
             self.current_linenr = 0
             self.file_path.text.set(path)
             self.file_data = lib.read_log_from_path(path)
-            self.display_log()
             self.prepare_details()
+            self.parse_date()
             self.display_details(self.current_linenr)
             self.highlight_line(self.current_linenr+1)
 
         return
 
-    def display_log(self, log = None, max_chars = 30, _filter = lambda line: line):
-        if log is None:
-            print('Using default log')
-            log = self.file_data
-
-            if self.file_data is None:
-                print('No valid log to open')
-                return
-
-        strings = []
-        for num, line in enumerate(log):
-            new_line = _filter(line)
-            if new_line is None: continue
-            strings.append(';'.join([str(i) for i in new_line])[:max_chars]+'...')
-
+    def display_log(self, max_chars = 30,):
+        
         self.clear_text_field()
-        self.update_text_field(strings)
+        self.update_text_field(self.filtred_data)
+        self.display_details(1)
 
         return
 
@@ -164,10 +153,12 @@ class App:
                 return
             linenr = self.current_linenr
         if not self.file_data: return
-
-        dct = dicts.entry_to_dict(self.file_data[linenr])
-        for _, ((_, value), var) in enumerate(zip(dct.items(), self.detail_vars)):
-            var.text.set(value)
+        try:
+            dct = dicts.entry_to_dict(self.file_data[int(self.filtred_data[linenr].split(';')[-1])])
+            for _, ((_, value), var) in enumerate(zip(dct.items(), self.detail_vars)):
+                var.text.set(value)
+        except:
+            return
         return
         
     def next_log(self, dir=0):
@@ -182,30 +173,38 @@ class App:
         self.highlight_line(self.current_linenr+1, reset=True)
         return
 
-    def parse_date(self, event= None, start=0):
+    def parse_date(self,event= None, log = None, start=0):
+
+        if log is None:
+            log = self.file_data
+
+            if self.file_data is None:
+                print('No valid log to open')
+                return
+        
         to = self.date_to.get()
         fr = self.date_from.get()
 
-        if not to or not fr:
-            self.display_log()
+        try:
+            to = datetime.datetime.strptime(to, "%Y-%m-%d")
+            
+        except:
+            to = datetime.datetime.now()
+        
+        try:
+            fr = datetime.datetime.strptime(fr, "%Y-%m-%d")
+        except:
+            fr = datetime.datetime(1970,1,1)
 
-        # to = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=float(to))
-        # fr = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=float(fr))
-
-        to = datetime.datetime.strptime(to, "%Y-%m-%d")
-        fr = datetime.datetime.strptime(fr, "%Y-%m-%d")
-
-        def f(line):
+        self.filtred_data = []
+        for num, line in enumerate(log):
             temp = dicts.entry_to_dict(line)
             curr_ts = temp['ts']
-            # print(fr, curr_ts, to)
-            if fr <= curr_ts <= to: 
-                print('ret')
-                return line
-
-            else: return None
-
-        self.display_log(_filter=f)
+            if fr <= curr_ts <= to:
+ 
+                self.filtred_data.append(';'.join([str(i) for i in line])+';'+str(num))
+        self.prepare_details()
+        self.display_log()
 
         return
 

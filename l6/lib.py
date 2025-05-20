@@ -1,13 +1,13 @@
 import re
 
-def read_stations() -> list:
+def read_stations() -> list[str]:
     split_pattern = r'\n(?=(?:[^"]*"[^"]*")*[^"]*$)'
 
     file = open('data/stacje.csv', 'r')
-    filedata = file.read().strip()
-    filedata = re.split(split_pattern, filedata)
+    filedata : str = file.read().strip()
+    filedatalist : list[str] = re.split(split_pattern, filedata)
     file.close()
-    return filedata
+    return filedatalist
 
 def split_line(line):
     comma_pattern = r',(?=(?:[^"]*"[^"]*")*[^"]*$)'
