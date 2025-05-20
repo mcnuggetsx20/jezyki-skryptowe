@@ -185,16 +185,11 @@ class App:
         to = self.date_to.get()
         fr = self.date_from.get()
 
-        try:
-            to = datetime.datetime.strptime(to, "%Y-%m-%d")
-            
-        except:
-            to = datetime.datetime.now()
+        try: to = datetime.datetime.strptime(to, "%Y-%m-%d")
+        except: to = datetime.datetime.now()
         
-        try:
-            fr = datetime.datetime.strptime(fr, "%Y-%m-%d")
-        except:
-            fr = datetime.datetime(1970,1,1)
+        try: fr = datetime.datetime.strptime(fr, "%Y-%m-%d")
+        except: fr = datetime.datetime(1970,1,1)
 
         self.filtred_data = []
         for num, line in enumerate(log):
