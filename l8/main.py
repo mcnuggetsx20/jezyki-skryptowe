@@ -198,7 +198,7 @@ class App:
         def f(line):
             temp = dicts.entry_to_dict(line)
             curr_ts = temp['ts']
-            print(fr, curr_ts, to)
+            # print(fr, curr_ts, to)
             if fr <= curr_ts <= to: 
                 print('ret')
                 return line
