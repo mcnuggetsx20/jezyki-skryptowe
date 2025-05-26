@@ -115,7 +115,6 @@ def main_loop():
             fourth_choice()
 
 if __name__ == '__main__':
-    print('kupa')
     main_loop()
 
 
