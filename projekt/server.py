@@ -1,29 +1,7 @@
-import cv2
 import socket
 import select
 
-import SockArr as sa
-
-def getCam(device : int | str = 0) -> tuple[cv2.VideoCapture, int, int]:
-    camera = cv2.VideoCapture(device)
-
-    if not camera.isOpened():
-        print('couldnt open video capture device')
-        return None, 0, 0
-
-    ## ustawiamy najwyzsza mozliwa rozdzielczosc
-    high_value = 10**5
-    camera.set(cv2.CAP_PROP_FRAME_WIDTH, high_value)
-    camera.set(cv2.CAP_PROP_FRAME_HEIGHT, high_value)
-
-    width,height = map( 
-        int, (
-            camera.get(cv2.CAP_PROP_FRAME_WIDTH), 
-            camera.get(cv2.CAP_PROP_FRAME_HEIGHT)
-        )
-    )
-
-    return camera, width, height
+import lib.SockArr as sa
 
 def getDiscoverySocket(port) -> socket.socket:
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -43,8 +21,8 @@ def getListeningSocket(port) -> socket.socket:
     return sock
 
 if __name__ == '__main__':
-    camera, width, height = getCam()
     port = 3490
+    max_msg_size = 1024
 
     discoverySocket = getDiscoverySocket(port)
     serverSocket = getListeningSocket(port)
@@ -54,13 +32,6 @@ if __name__ == '__main__':
     sockets.addSocket(serverSocket)
 
     while True:
-        # ret, frame = camera.read()
-        # if not ret:
-        #     raise Exception("Failed to read frame!")
-        #
-        # cv2.imshow('Sneak', frame)
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #     break
 
         events = sockets.poller.poll(1000) #1 sekunda
 
@@ -72,7 +43,7 @@ if __name__ == '__main__':
 
             if fd == discoverySocket.fileno():
                 #mamy probe odkrycia
-                msg, sender = discoverySocket.recvfrom(1024)
+                msg, sender = discoverySocket.recvfrom(max_msg_size)
                 discoverySocket.sendto(b'b', sender)
 
             elif fd == serverSocket.fileno():
@@ -84,16 +55,10 @@ if __name__ == '__main__':
             else:
                 #jeden z klientow cos od nas chce
                 sock = sockets.getSocket(fd)
-                data = sock.recv(1024)
+                data = sock.recv(max_msg_size)
 
                 if not data:
                     #to znaczy ze sie odlaczyl
                     sockets.rmSocket(fd)
                     print('a client disconnected')
-
-
-
-    camera.release()
-    cv2.destroyAllWindows()
-
 
