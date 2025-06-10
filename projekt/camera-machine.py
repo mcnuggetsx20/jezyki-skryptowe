@@ -50,8 +50,8 @@ if __name__ == '__main__':
     serverSocket = getListeningSocket(port)
     sockets = sa.SockArr()
 
-    sockets.addsocket(discoverySocket)
-    sockets.addsocket(serverSocket)
+    sockets.addSocket(discoverySocket)
+    sockets.addSocket(serverSocket)
 
     while True:
         # ret, frame = camera.read()
@@ -64,6 +64,7 @@ if __name__ == '__main__':
 
         events = sockets.poller.poll(1000) #1 sekunda
 
+        print('poll')
         if not events: continue
 
         for fd, event in events:
@@ -77,17 +78,18 @@ if __name__ == '__main__':
             elif fd == serverSocket.fileno():
                 #mamy probe polaczenia
                 new_sock,_ = serverSocket.accept() #tu zamiast _ mozna zebrac adres
-                sockets.addSock(new_sock)
+                sockets.addSocket(new_sock)
                 print('registered a new client')
 
             else:
                 #jeden z klientow cos od nas chce
-                sock = sockets.getSock(fd)
+                sock = sockets.getSocket(fd)
                 data = sock.recv(1024)
 
                 if not data:
                     #to znaczy ze sie odlaczyl
-                    sockets.rmSock(fd)
+                    sockets.rmSocket(fd)
+                    print('a client disconnected')
 
 
 
