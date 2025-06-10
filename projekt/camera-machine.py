@@ -2,11 +2,13 @@ import cv2
 import socket
 import select
 
+import SockArr as sa
+
 def getCam(device : int | str = 0) -> tuple[cv2.VideoCapture, int, int]:
     camera = cv2.VideoCapture(device)
 
     if not camera.isOpened():
-        print('couldnt open a video capture device')
+        print('couldnt open video capture device')
         return None, 0, 0
 
     ## ustawiamy najwyzsza mozliwa rozdzielczosc
@@ -46,9 +48,10 @@ if __name__ == '__main__':
 
     discoverySocket = getDiscoverySocket(port)
     serverSocket = getListeningSocket(port)
-    poller = select.poll()
+    sockets = sa.SockArr()
 
-    poller.register(discoverySocket, select.POLLIN)
+    sockets.addsocket(discoverySocket)
+    sockets.addsocket(serverSocket)
 
     while True:
         # ret, frame = camera.read()
@@ -59,7 +62,7 @@ if __name__ == '__main__':
         # if cv2.waitKey(1) & 0xFF == ord('q'):
         #     break
 
-        events = poller.poll(1000) #1 sekunda
+        events = sockets.poller.poll(1000) #1 sekunda
 
         if not events: continue
 
@@ -74,11 +77,17 @@ if __name__ == '__main__':
             elif fd == serverSocket.fileno():
                 #mamy probe polaczenia
                 new_sock,_ = serverSocket.accept() #tu zamiast _ mozna zebrac adres
-                poller.register(new_sock, select.POLLIN)
+                sockets.addSock(new_sock)
+                print('registered a new client')
 
             else:
                 #jeden z klientow cos od nas chce
-                pass
+                sock = sockets.getSock(fd)
+                data = sock.recv(1024)
+
+                if not data:
+                    #to znaczy ze sie odlaczyl
+                    sockets.rmSock(fd)
 
 
 
