@@ -11,15 +11,16 @@ def findServer(port):
         print('scanning local network...')
 
         try:
-            msg = sock.recvfrom(1024)
+            msg, sender = sock.recvfrom(1024)
 
         except socket.timeout:
             continue
 
         break
 
-    print(msg)
     sock.close()
 
+    return sender
+
 if __name__ == '__main__':
-    findServer(3490)
+    camera_addr, camera_port = findServer(3490)

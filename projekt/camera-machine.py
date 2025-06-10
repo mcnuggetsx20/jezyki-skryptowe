@@ -29,10 +29,23 @@ def getDiscoverySocket(port) -> socket.socket:
     sock.setblocking(False)
     return sock
 
+def getListeningSocket(port) -> socket.socket:
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    #zeby sie nie blokowalo, bo sa bugi czasem
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
+
+    sock.bind(('', port))
+    sock.listen()
+
+    return sock
+
 if __name__ == '__main__':
     camera, width, height = getCam()
+    port = 3490
 
-    discoverySocket = getDiscoverySocket(3490)
+    discoverySocket = getDiscoverySocket(port)
+    serverSocket = getListeningSocket(port)
     poller = select.poll()
 
     poller.register(discoverySocket, select.POLLIN)
@@ -51,11 +64,22 @@ if __name__ == '__main__':
         if not events: continue
 
         for fd, event in events:
+            if not (event & select.POLLIN): continue
+
             if fd == discoverySocket.fileno():
-                if event & select.POLLIN:
-                    #mamy probe odkrycia
-                    msg, sender = discoverySocket.recvfrom(1024)
-                    discoverySocket.sendto(b'b', sender)
+                #mamy probe odkrycia
+                msg, sender = discoverySocket.recvfrom(1024)
+                discoverySocket.sendto(b'b', sender)
+
+            elif fd == serverSocket.fileno():
+                #mamy probe polaczenia
+                new_sock,_ = serverSocket.accept() #tu zamiast _ mozna zebrac adres
+                poller.register(new_sock, select.POLLIN)
+
+            else:
+                #jeden z klientow cos od nas chce
+                pass
+
 
 
     camera.release()
