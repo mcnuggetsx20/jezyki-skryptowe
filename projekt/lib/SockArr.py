@@ -11,6 +11,7 @@ class SockArr:
         return self.sock_dct[fd]
 
     def addSocket(self, sock, events = select.POLLIN):
+        print(f'add {sock.fileno()}')
         self.poller.register(sock, events)
         self.sock_dct[sock.fileno()] = sock
         return

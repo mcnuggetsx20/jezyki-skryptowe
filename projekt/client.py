@@ -36,10 +36,22 @@ class Client:
     def pollEvents(self, timeout = 1000):
         events = self.sockets.poller.poll(timeout)
         if not events: return
+
         for fd, event in events:
             current_socket = self.sockets.getSocket(fd)
 
             if current_socket == self.clientSocket:
+
+                if event & select.POLLOUT:
+                    err = current_socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
+                    if err:
+                        current_socket.close()
+                    else:
+                        #zmiana eventa z POLLOUT na POLLIN
+                        self.sockets.rmSocket(fd)
+                        self.sockets.addSocket(current_socket)
+                    continue
+
                 msg, _ = current_socket.recvfrom(self.MSG_SIZE)
                 if msg:
                     pass
@@ -49,10 +61,13 @@ class Client:
                     self.clientSocket = None
                     self.sockets.rmSocket(fd)
             else:
+
                 # tutaj nasz socket udp cos zwrocil,
                 # my go uzywamy tylko do laczenia sie z serwerem
                 # wiec jesli nie potrzebujemy polaczenia 
                 # (bo np je juz mamy) to elo
+                print(f'else {fd}')
+
 
                 if self.clientSocket: return
 
@@ -60,15 +75,19 @@ class Client:
 
                 if msg == self.MSG_FROM_SERVER:
                     self.clientSocket = self.getClientSocket(self.PORT)
-                    self.clientSocket.connect(sender)
-                    self.sockets.addSocket(self.clientSocket)
+
+                    # tutaj tak trzeba bo mamy non-blocking na clientSocket
+                    try: self.clientSocket.connect(sender)
+                    except BlockingIOError: pass
+
+                    self.sockets.addSocket(self.clientSocket, events=select.POLLOUT)
 
         return
 
     def prepare(self):
-        clientSocket = self.getClientSocket(self.PORT)
+        # self.clientSocket = self.getClientSocket(self.PORT)
 
-        self.sockets.addSocket(clientSocket)
+        # self.sockets.addSocket(self.clientSocket)
         self.sockets.addSocket(self.getDgramSocket(self.PORT))
 
 if __name__ == '__main__':
@@ -76,13 +95,4 @@ if __name__ == '__main__':
     client.prepare()
     while True:
         client.pollEvents()
-
-
-
-
-
-
-
-
-    
 
