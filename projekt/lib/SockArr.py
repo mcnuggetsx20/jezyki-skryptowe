@@ -7,7 +7,7 @@ class SockArr:
         return
 
     def getSocket(self, fd):
-        print(f'get{fd}')
+        # print(f'get{fd}')
         return self.sock_dct[fd]
 
     def addSocket(self, sock, events = select.POLLIN):

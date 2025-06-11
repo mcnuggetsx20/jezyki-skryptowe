@@ -1,37 +1,88 @@
 import socket
+import select
 
-def findServer(port):
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, True)
+import lib.SockArr as sa
 
-    sock.settimeout(1)
+class Client:
+    def __init__(self):
+        self.clientSocket = None
+        self.serverInfo = (None, None)
+        self.sockets = sa.SockArr()
 
-    while True:
-        sock.sendto(b"a", ('255.255.255.255', port))
-        print('scanning local network...')
+        self.MSG_SIZE = 1024
+        self.PORT = 3490
+        self.MSG_FROM_SERVER = b'serverup'
 
-        try:
-            msg, sender = sock.recvfrom(1024)
+        return;
 
-        except socket.timeout:
-            continue
+    def getDgramSocket(self, port):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind(('', port))
 
-        break
+        sock.setblocking(False)
+        return sock
 
-    sock.close()
+    def getClientSocket(self, port) -> socket.socket:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
+        sock.setblocking(False)
 
-    return sender
+        # tutaj bindujemy pomimo tego ze jest pozniej
+        # connect() bo chcemy ten port czym predzej zarezerwowac
+        sock.bind(('', port))
 
-def getClientSocket() -> socket.socket:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
+        return sock
 
-    return sock
+    def pollEvents(self, timeout = 1000):
+        events = self.sockets.poller.poll(timeout)
+        if not events: return
+        for fd, event in events:
+            current_socket = self.sockets.getSocket(fd)
+
+            if current_socket == self.clientSocket:
+                msg, _ = current_socket.recvfrom(self.MSG_SIZE)
+                if msg:
+                    pass
+                else:
+                    # tutaj nam sie tcp rozlaczyl
+                    current_socket.close()
+                    self.clientSocket = None
+                    self.sockets.rmSocket(fd)
+            else:
+                # tutaj nasz socket udp cos zwrocil,
+                # my go uzywamy tylko do laczenia sie z serwerem
+                # wiec jesli nie potrzebujemy polaczenia 
+                # (bo np je juz mamy) to elo
+
+                if self.clientSocket: return
+
+                msg, sender = current_socket.recvfrom(self.MSG_SIZE)
+
+                if msg == self.MSG_FROM_SERVER:
+                    self.clientSocket = self.getClientSocket(self.PORT)
+                    self.clientSocket.connect(sender)
+                    self.sockets.addSocket(self.clientSocket)
+
+        return
+
+    def prepare(self):
+        clientSocket = self.getClientSocket(self.PORT)
+
+        self.sockets.addSocket(clientSocket)
+        self.sockets.addSocket(self.getDgramSocket(self.PORT))
 
 if __name__ == '__main__':
-    camera_addr, camera_port = findServer(3490)
+    client = Client()
+    client.prepare()
+    while True:
+        client.pollEvents()
 
-    clientSocket = getClientSocket()
-    clientSocket.connect((camera_addr, camera_port))
 
+
+
+
+
+
+
+    
 
