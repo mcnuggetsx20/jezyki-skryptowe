@@ -9,14 +9,14 @@ class MenuBar(Frame):
         self.app = app
 
         self.pack(side="top", fill="x")
+        ttk.Button(self, text="←", width=2 , command=self.go_back).pack(side="left", padx=1)
         ttk.Button(self, text="Settings", command=self.menu_bar_settings).pack(side="left", padx=5)
+        ttk.Button(self, text="refresh", command=self.refresh_devices).pack(side="right", padx=5)
         
     def menu_bar_settings(self):
         self.context_menu = tk.Menu(self, tearoff=0)
         self.context_menu.add_command(label="Manage floors", command=lambda: self.manage_floors())
         self.context_menu.add_command(label="Set floor's background", command=lambda: self.set_floor_background())
-        self.context_menu.add_separator()
-        self.context_menu.add_command(label="Usuń z piętra", command=lambda: self.remove_device_from_floor(dev))
         self.context_menu.tk_popup(self.winfo_rootx(), self.winfo_rooty() + self.winfo_height())
     
     def manage_floors(self):
@@ -77,8 +77,8 @@ class MenuBar(Frame):
                 self.app.floor_names = names
                 self.app.total_floors = len(names)
                 self.app.floor = min(self.app.floor, len(names) - 1)
-                self.app.floor_label.config(text=f"Piętro: {self.app.floor_names[self.app.floor]}")
-                self.app.draw_devices_on_canvas()
+                self.app.main_frame.floor_label.config(text=f"Piętro: {self.app.floor_names[self.app.floor]}")
+                self.app.main_frame.draw_devices_on_canvas()
                 self.app.save_layout_to_file("layout.json")
             win.destroy()
 
@@ -108,8 +108,8 @@ class MenuBar(Frame):
         def choose_file():
             filepath = filedialog.askopenfilename(filetypes=[("Obrazy", "*.png *.jpg *.jpeg *.bmp")])
             if filepath:
-                canvas_width = self.app.canvas.winfo_width() or self.app.winfo_width()
-                canvas_height = self.app.canvas.winfo_height() or self.app.winfo_height()
+                canvas_width = self.app.main_frame.canvas.winfo_width() or self.app.main_frame.winfo_width()
+                canvas_height = self.app.main_frame.canvas.winfo_height() or self.app.main_frame.winfo_height()
 
                 try:
                     img = Image.open(filepath).resize((canvas_width, canvas_height))
@@ -124,16 +124,22 @@ class MenuBar(Frame):
                     tk.messagebox.showerror("Błąd", "Nieprawidłowe piętro.")
                     return
 
-                self.app.loaded_background_images[floor] = photo
+                self.app.main_frame.loaded_background_images[floor] = photo
                 self.app.floor_backgrounds[floor] = filepath
 
                 if self.app.floor == floor:
-                    self.app.draw_devices_on_canvas()
+                    self.app.main_frame.draw_devices_on_canvas()
 
                 self.app.save_layout_to_file("layout.json")
                 win.destroy()
 
         ttk.Button(win, text="Wybierz obraz...", command=choose_file).pack(pady=10)
         ttk.Button(win, text="Anuluj", command=win.destroy).pack(pady=5)
+    
+    def refresh_devices(self):
+        return
+    
+    def go_back(self):
+        self.app.go_to_menu()
 
 
