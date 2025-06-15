@@ -8,6 +8,9 @@ class Client:
         self.clientSocket = None
         self.serverInfo = (None, None)
         self.sockets = sa.SockArr()
+        self.client_connected = False
+
+        self.send_queue = list()
 
         self.MSG_SIZE = 1024
         self.PORT = 3490
@@ -46,10 +49,13 @@ class Client:
                     err = current_socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
                     if err:
                         current_socket.close()
+                        self.sockets.rmSocket(fd)
+                        self.client_connected = False
                     else:
                         #zmiana eventa z POLLOUT na POLLIN
                         self.sockets.rmSocket(fd)
                         self.sockets.addSocket(current_socket)
+                        self.client_connected = True
                     continue
 
                 msg, _ = current_socket.recvfrom(self.MSG_SIZE)
@@ -57,8 +63,8 @@ class Client:
                     pass
                 else:
                     # tutaj nam sie tcp rozlaczyl
+                    self.client_connected = False
                     current_socket.close()
-                    self.clientSocket = None
                     self.sockets.rmSocket(fd)
             else:
 
@@ -82,7 +88,16 @@ class Client:
 
                     self.sockets.addSocket(self.clientSocket, events=select.POLLOUT)
 
+            if self.client_connected:
+                for i in self.send_queue:
+                    self.clientSocket.sendall(i)
+
+                self.send_queue = []
+
         return
+
+    def add_to_send(self, data):
+        self.send_queue.append(data)
 
     def prepare(self):
         # self.clientSocket = self.getClientSocket(self.PORT)

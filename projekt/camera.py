@@ -1,4 +1,7 @@
 import cv2
+import pickle
+import client
+import struct
 
 def getCam(device : int | str = 0) -> tuple[cv2.VideoCapture, int, int]:
     camera = cv2.VideoCapture(device)
@@ -23,15 +26,23 @@ def getCam(device : int | str = 0) -> tuple[cv2.VideoCapture, int, int]:
 
 if __name__ == '__main__':
     camera, width, height = getCam()
+    cl = client.Client()
+    cl.prepare()
 
     while True:
         ret, frame = camera.read()
         if not ret:
             raise Exception("Failed to read frame!")
 
+        _, encoded = cv2.imencode('.jpg', frame)
+        data = pickle.dumps(encoded)
+        cl.add_to_send(struct.pack('L', len(data)) + data)
+
         cv2.imshow('Sneak', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
+        cl.pollEvents(timeout=0)
 
     camera.release()
     cv2.destroyAllWindows()
