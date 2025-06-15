@@ -22,3 +22,6 @@ class SockArr:
         self.poller.unregister(fd)
         return
 
+    def modSocket(self, fd, events):
+        self.poller.modify(fd, events)
+

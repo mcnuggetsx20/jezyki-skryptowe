@@ -38,14 +38,14 @@ class Client:
 
     def pollEvents(self, timeout = 1000):
         events = self.sockets.poller.poll(timeout)
-        if not events: return
+        # if not events: return
 
         for fd, event in events:
             current_socket = self.sockets.getSocket(fd)
 
             if current_socket == self.clientSocket:
 
-                if event & select.POLLOUT:
+                if not self.client_connected and (event & select.POLLOUT):
                     err = current_socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
                     if err:
                         current_socket.close()
@@ -53,19 +53,34 @@ class Client:
                         self.client_connected = False
                     else:
                         #zmiana eventa z POLLOUT na POLLIN
-                        self.sockets.rmSocket(fd)
-                        self.sockets.addSocket(current_socket)
+                        print('established a tcp connection')
+                        self.sockets.modSocket(fd, select.POLLIN | select.POLLOUT)
                         self.client_connected = True
                     continue
 
-                msg, _ = current_socket.recvfrom(self.MSG_SIZE)
-                if msg:
-                    pass
-                else:
-                    # tutaj nam sie tcp rozlaczyl
-                    self.client_connected = False
-                    current_socket.close()
-                    self.sockets.rmSocket(fd)
+                if self.client_connected:
+                    if event & select.POLLIN:
+                        msg, _ = current_socket.recv(self.MSG_SIZE)
+                        if msg:
+                            pass
+                        else:
+                            # tutaj nam sie tcp rozlaczyl
+                            self.client_connected = False
+                            current_socket.close()
+                            self.sockets.rmSocket(fd)
+
+                    elif (event & select.POLLOUT) and self.send_queue:
+                        data_to_send = self.send_queue[0]
+                        bytes_sent = current_socket.send(data_to_send)
+
+                        if bytes_sent < len(data_to_send):
+                            self.send_queue[0] = data_to_send[bytes_sent:]
+                        else:
+                            self.send_queue.pop(0)
+
+                        if not self.send_queue:
+                            self.sockets.modSocket(fd, select.POLLIN)
+
             else:
 
                 # tutaj nasz socket udp cos zwrocil,
@@ -87,12 +102,6 @@ class Client:
                     except BlockingIOError: pass
 
                     self.sockets.addSocket(self.clientSocket, events=select.POLLOUT)
-
-            if self.client_connected:
-                for i in self.send_queue:
-                    self.clientSocket.sendall(i)
-
-                self.send_queue = []
 
         return
 

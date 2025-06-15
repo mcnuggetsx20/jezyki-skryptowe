@@ -86,7 +86,7 @@ if __name__ == '__main__':
                 sock = sockets.getSocket(fd)
                 data = b''
                 while len(data) < camera_payload_size:
-                    packet = serverSocket.recv(max_msg_size)
+                    packet = sock.recv(max_msg_size)
                     if not packet: break
                     data += packet
 
@@ -101,7 +101,7 @@ if __name__ == '__main__':
                 size,_ = struct.unpack('L', packed_size)
 
                 while len(data) < size:
-                    data += serverSocket.recv(max_msg_size)
+                    data += sock.recv(max_msg_size)
 
                 frame_data = data[:size]
                 data = data[size:]    
