@@ -1,5 +1,8 @@
 import socket
 import select
+import struct
+import pickle
+import cv2
 
 import lib.SockArr as sa
 
@@ -47,7 +50,7 @@ def getListeningSocket(port) -> socket.socket:
 
 if __name__ == '__main__':
     port = 3490
-    max_msg_size = 1024
+    max_msg_size = 4096
     MSG_FROM_SERVER = b'serverup'
 
     broadcastSocket = getBroadcastSocket(port)
@@ -58,6 +61,8 @@ if __name__ == '__main__':
 
     # to jest sygnal ze se wstalismy
     broadcastSocket.sendto(MSG_FROM_SERVER, ('255.255.255.255', port))
+
+    camera_payload_size = struct.calcsize('L')
 
     while True:
 
@@ -79,10 +84,30 @@ if __name__ == '__main__':
             else:
                 #jeden z klientow cos od nas chce
                 sock = sockets.getSocket(fd)
-                data = sock.recv(max_msg_size)
+                data = b''
+                while len(data) < camera_payload_size:
+                    packet = serverSocket.recv(max_msg_size)
+                    if not packet: break
+                    data += packet
 
                 if not data:
                     #to znaczy ze sie odlaczyl
                     sockets.rmSocket(fd)
                     print('a client disconnected')
+
+                packed_size = data[:camera_payload_size]
+                data = data[camera_payload_size:]
+
+                size,_ = struct.unpack('L', packed_size)
+
+                while len(data) < size:
+                    data += serverSocket.recv(max_msg_size)
+
+                frame_data = data[:size]
+                data = data[size:]    
+
+                frame = pickle.loads(frame_data)
+                frame = cv2.imdecode(frame, 1)
+
+                cv2.imshow('Klient', frame)
 

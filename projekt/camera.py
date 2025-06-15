@@ -34,11 +34,12 @@ if __name__ == '__main__':
         if not ret:
             raise Exception("Failed to read frame!")
 
-        _, encoded = cv2.imencode('.jpg', frame)
-        data = pickle.dumps(encoded)
-        cl.add_to_send(struct.pack('L', len(data)) + data)
+        if cl.client_connected:
+            _, encoded = cv2.imencode('.jpg', frame)
+            data = pickle.dumps(encoded)
+            cl.add_to_send(struct.pack('L', len(data)) + data)
 
-        cv2.imshow('Sneak', frame)
+        # cv2.imshow('Sneak', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
