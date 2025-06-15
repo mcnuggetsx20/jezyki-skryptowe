@@ -39,9 +39,6 @@ if __name__ == '__main__':
             data = pickle.dumps(encoded)
             cl.add_to_send(struct.pack('L', len(data)) + data)
 
-        # cv2.imshow('Sneak', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
 
         cl.pollEvents(timeout=0)
 

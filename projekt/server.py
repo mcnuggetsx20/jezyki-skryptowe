@@ -86,6 +86,7 @@ if __name__ == '__main__':
                 sock = sockets.getSocket(fd)
                 data = b''
                 while len(data) < camera_payload_size:
+                    print('1st loop')
                     packet = sock.recv(max_msg_size)
                     if not packet: break
                     data += packet
@@ -101,7 +102,15 @@ if __name__ == '__main__':
                 size= struct.unpack('L', packed_size)[0]
 
                 while len(data) < size:
-                    data += sock.recv(max_msg_size)
+                    print('2nd loop')
+                    packet = sock.recv(max_msg_size)
+                    if not packet: break
+                    data += packet
+
+                if not data:
+                    #to znaczy ze sie odlaczyl
+                    sockets.rmSocket(fd)
+                    print('a client disconnected')
 
                 frame_data = data[:size]
                 data = data[size:]    
@@ -110,4 +119,5 @@ if __name__ == '__main__':
                 frame = cv2.imdecode(frame, 1)
 
                 cv2.imshow('Klient', frame)
+                cv2.waitKey(1)
 
