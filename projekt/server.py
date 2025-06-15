@@ -98,7 +98,7 @@ if __name__ == '__main__':
                 packed_size = data[:camera_payload_size]
                 data = data[camera_payload_size:]
 
-                size,_ = struct.unpack('L', packed_size)
+                size= struct.unpack('L', packed_size)[0]
 
                 while len(data) < size:
                     data += sock.recv(max_msg_size)
