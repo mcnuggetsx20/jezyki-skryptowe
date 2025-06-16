@@ -4,6 +4,9 @@ class SockArr:
     def __init__(self):
         self.sock_dct = dict()
         self.poller = select.poll()
+
+        self.ids = dict()
+
         return
 
     def getSocket(self, fd):
@@ -20,8 +23,17 @@ class SockArr:
         print(f'rm{fd}')
         del self.sock_dct[fd]
         self.poller.unregister(fd)
+
         return
 
     def modSocket(self, fd, events):
         self.poller.modify(fd, events)
+        return
 
+    def setId(self, fd, id):
+        self.ids[fd] = id
+        return
+
+    def getId(self, fd):
+        return self.ids.get(fd, None)
+        

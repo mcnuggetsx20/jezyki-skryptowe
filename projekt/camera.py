@@ -1,7 +1,9 @@
 import cv2
-import pickle
 import client
 import struct
+
+from lib.types import *
+from lib.commands import *
 
 def getCam(device : int | str = 0) -> tuple[cv2.VideoCapture, int, int]:
     camera = cv2.VideoCapture(device)
@@ -26,24 +28,29 @@ def getCam(device : int | str = 0) -> tuple[cv2.VideoCapture, int, int]:
 
 if __name__ == '__main__':
     camera, width, height = getCam()
-    cl = client.Client()
+    cl = client.Client(tp=TYPE_CAMERA, identity='kamerka')
     cl.prepare()
 
-    while True:
-        ret, frame = camera.read()
-        if not ret:
-            raise Exception("Failed to read frame!")
+    try:
+        while True:
+            ret, frame = camera.read()
+            if not ret:
+                raise Exception("Failed to read frame!")
 
-        if cl.client_connected:
-            _, encoded = cv2.imencode('.jpg', frame)
-            data = pickle.dumps(encoded)
-            cl.add_to_send(struct.pack('L', len(data)) + data)
+            if cl.client_connected:
+                _, encoded = cv2.imencode('.jpg', frame)
+                data = encoded.tobytes()
+                cl.add_to_send(struct.pack('!BI', 
+                    COMMAND_CAMERA_STREAM, len(data)) + data)
+                # cl.add_to_send(
+                #     header=COMMAND_CAMERA_STREAM,
+                #     data = data,
+                #     format = '!BI'
+                # )
 
-        # cv2.imshow('Sneak', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
 
-        cl.pollEvents(timeout=0)
-
-    camera.release()
-    cv2.destroyAllWindows()
+            cl.pollEvents(timeout=0)
+    except KeyboardInterrupt:
+        camera.release()
+        cv2.destroyAllWindows()
+        cl.cleanup()
