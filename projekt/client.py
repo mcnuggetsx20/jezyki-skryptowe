@@ -71,6 +71,7 @@ class Client:
 
                     elif (event & select.POLLOUT) and self.send_queue:
                         data_to_send = self.send_queue[0]
+                        print(len(data_to_send))
                         bytes_sent = current_socket.send(data_to_send)
 
                         if bytes_sent < len(data_to_send):

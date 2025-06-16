@@ -100,9 +100,11 @@ if __name__ == '__main__':
                 data = data[camera_payload_size:]
 
                 size= struct.unpack('!I', packed_size)[0]
+                print(len(packed_size), size)
 
                 while len(data) < size:
                     # print('2nd loop', len(data), size)
+
                     packet = sock.recv(max_msg_size)
                     if not packet: break
                     data += packet
