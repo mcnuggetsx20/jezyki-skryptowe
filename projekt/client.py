@@ -1,5 +1,6 @@
 import socket
 import select
+import time
 
 import lib.SockArr as sa
 
@@ -70,8 +71,8 @@ class Client:
 
                     elif (event & select.POLLOUT) and self.send_queue:
                         data_to_send = self.send_queue[0]
-                        print(len(data_to_send))
                         bytes_sent = current_socket.send(data_to_send)
+                        print(time.time(), len(data_to_send), bytes_sent)
 
                         if bytes_sent < len(data_to_send):
                             self.send_queue[0] = data_to_send[bytes_sent:]
@@ -103,6 +104,9 @@ class Client:
                     except BlockingIOError: pass
 
                     self.sockets.addSocket(self.clientSocket, events=select.POLLOUT)
+
+        if self.client_connected:
+            self.sockets.modSocket(self.clientSocket.fileno(), select.POLLOUT | select.POLLIN)
 
         return
 

@@ -52,6 +52,7 @@ if __name__ == '__main__':
     port = 3490
     max_msg_size = 4096
     MSG_FROM_SERVER = b'serverup'
+    MAX_FRAME_SIZE = 10**6
 
     broadcastSocket = getBroadcastSocket(port)
     serverSocket = getListeningSocket(port)
@@ -100,6 +101,8 @@ if __name__ == '__main__':
                 data = data[camera_payload_size:]
 
                 size= struct.unpack('!I', packed_size)[0]
+                if size > MAX_FRAME_SIZE: 
+                    continue
 
                 while len(data) < size:
                     # print('2nd loop', len(data), size)
