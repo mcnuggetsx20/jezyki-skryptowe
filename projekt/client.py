@@ -67,9 +67,10 @@ class Client:
 
                         id_bytes = self.identity.encode('utf-8')
                         msg = struct.pack('!BBB', COMMAND_IDENTIFY, self._type, len(id_bytes)) + id_bytes
+                        self.send_queue.append(msg) #informacja o tym kim jestesmy
 
-                        current_socket.send(msg) #informacja o tym kim jestesmy
-                    continue
+                        # current_socket.send(msg) #informacja o tym kim jestesmy
+                    # continue
 
                 if self.client_connected:
                     if event & select.POLLIN:

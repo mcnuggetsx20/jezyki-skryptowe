@@ -1,11 +1,12 @@
 import select
+from collections import defaultdict
 
 class SockArr:
     def __init__(self):
         self.sock_dct = dict()
         self.poller = select.poll()
 
-        self.ids = dict()
+        self.props = defaultdict(lambda: {'id': None, 'name' : None})
 
         return
 
@@ -31,9 +32,16 @@ class SockArr:
         return
 
     def setId(self, fd, id):
-        self.ids[fd] = id
+        self.props[fd]['id'] = id
         return
 
     def getId(self, fd):
-        return self.ids.get(fd, None)
+        return self.props[fd]['id']
+
+    def setName(self, fd, name):
+        self.props[fd]['name'] = name
+        return
+
+    def getName(self, fd):
+        return self.props[fd]['name']
         

@@ -34,6 +34,9 @@ def identify_handler(fd, sockets):
     device_name = device_name_packed.decode('utf-8')
 
     print(device_type, name_len, device_name)
+
+    sockets.setId(fd, device_type)
+    sockets.setName(fd, device_name)
     return
 
 def camera_handler(fd, sockets, 
