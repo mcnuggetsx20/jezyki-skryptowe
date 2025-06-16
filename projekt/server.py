@@ -63,7 +63,7 @@ def main_loop():
                 data = b''
                 #najpierw odbieramy tylko typ komendy
                 while len(data) < 1:
-                    packet = current_socket.recv(max_msg_size)
+                    packet = current_socket.recv(1)
                     if not packet: break
                     data += packet
 
@@ -72,6 +72,7 @@ def main_loop():
                     sockets.rmSocket(fd)
                     continue
 
+                print(len(data))
                 command = struct.unpack('!B', data[:1])[0]
                 print(f'command {command}')
 

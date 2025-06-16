@@ -14,7 +14,7 @@ def camera_handler(fd, sockets, camera_payload_size,
 
     while len(data) < camera_payload_size:
         print('1st loop')
-        packet = sock.recv(max_msg_size)
+        packet = sock.recv(camera_payload_size)
         if not packet: break
         data += packet
 
@@ -30,14 +30,16 @@ def camera_handler(fd, sockets, camera_payload_size,
     data = data[camera_payload_size:]
 
     size= struct.unpack('!I', packed_size)[0]
+    print(struct.unpack('!I', packed_size))
     if size > MAX_FRAME_SIZE: 
         print('exceeded max frame size')
+        print(size)
         return
 
     while len(data) < size:
         # print('2nd loop', len(data), size)
 
-        packet = sock.recv(max_msg_size)
+        packet = sock.recv(size-len(data))
         if not packet: break
         data += packet
 
