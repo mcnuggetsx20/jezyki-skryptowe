@@ -38,49 +38,50 @@ def main_loop():
         if not events: continue
 
         for fd, event in events:
-            if not (event & select.POLLIN): continue
             current_socket = sockets.getSocket(fd)
 
             if current_socket == serverSocket:
-                #mamy probe polaczenia
-                new_sock,_ = serverSocket.accept() #tu zamiast _ mozna zebrac adres
-                sockets.addSocket(new_sock)
-                print('registered a new client')
+                if event & select.POLLIN:
+                    #mamy probe polaczenia
+                    new_sock,_ = serverSocket.accept() #tu zamiast _ mozna zebrac adres
+                    sockets.addSocket(new_sock, events= select.POLLIN | select.select.POLLOUT)
+                    print('registered a new client')
 
             else:
-                #jeden z klientow cos od nas chce
-                # if sockets.getId(fd) == None:
-                #     msg = current_socket.recv(10)
-                #     if msg:
-                #         sockets.setId(fd, msg)
-                #
-                # elif sockets.getId(fd) == b'cam':
-                #     hdlrs.camera_handler(fd, sockets, camera_payload_size)
-                #
-                # else:
-                #     pass
+                if event & select.POLLIN:
+                    #jeden z klientow cos od nas chce
+                    # if sockets.getId(fd) == None:
+                    #     msg = current_socket.recv(10)
+                    #     if msg:
+                    #         sockets.setId(fd, msg)
+                    #
+                    # elif sockets.getId(fd) == b'cam':
+                    #     hdlrs.camera_handler(fd, sockets, camera_payload_size)
+                    #
+                    # else:
+                    #     pass
 
-                data = b''
-                #najpierw odbieramy tylko typ komendy
-                while len(data) < 1:
-                    packet = current_socket.recv(1)
-                    if not packet: break
-                    data += packet
+                    data = b''
+                    #najpierw odbieramy tylko typ komendy
+                    while len(data) < 1:
+                        packet = current_socket.recv(1)
+                        if not packet: break
+                        data += packet
 
-                if len(data) < 1:
-                    current_socket.close()
-                    sockets.rmSocket(fd)
-                    continue
+                    if len(data) < 1:
+                        current_socket.close()
+                        sockets.rmSocket(fd)
+                        continue
 
-                print(len(data))
-                command = struct.unpack('!B', data[:1])[0]
-                print(f'command {command}')
+                    print(len(data))
+                    command = struct.unpack('!B', data[:1])[0]
+                    print(f'command {command}')
 
-                if command == COMMAND_IDENTIFY:
-                    hndlrs.identify_handler(fd, sockets)
-                
-                elif command == COMMAND_CAMERA_STREAM:
-                    hndlrs.camera_handler(fd, sockets, camera_payload_size)
+                    if command == COMMAND_IDENTIFY:
+                        hndlrs.identify_handler(fd, sockets)
+                    
+                    elif command == COMMAND_CAMERA_STREAM:
+                        hndlrs.camera_handler(fd, sockets)
 
 if __name__ == '__main__':
     port = 3490

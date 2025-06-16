@@ -95,11 +95,6 @@ class Client:
 
                     elif (event & select.POLLOUT) and self.send_queue:
 
-                        # header = self.send_queue[0]['header']
-                        # data = self.send_queue[0]['data']
-                        # format = self.send_queue[0]['format']
-
-                        # data_to_send = struct.pack(format, header, len(data)) + data
                         data_to_send = self.send_queue[0]
 
                         bytes_sent = current_socket.send(data_to_send)
@@ -141,11 +136,6 @@ class Client:
 
     def add_to_send(self, data):
         self.send_queue.append(data)
-        # self.send_queue.append({
-        #     'header': header,
-        #     'data' : data,
-        #     'format': format
-        #     })
 
     def cleanup(self):
         self.sockets.rmSocket(self.clientSocket.fileno())
