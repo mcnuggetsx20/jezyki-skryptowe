@@ -52,7 +52,6 @@ class Client:
                         self.sockets.rmSocket(fd)
                         self.client_connected = False
                     else:
-                        #zmiana eventa z POLLOUT na POLLIN
                         print('established a tcp connection')
                         self.sockets.modSocket(fd, select.POLLIN | select.POLLOUT)
                         self.client_connected = True
@@ -74,12 +73,11 @@ class Client:
                         print(len(data_to_send))
                         bytes_sent = current_socket.send(data_to_send)
 
-                        # if bytes_sent < len(data_to_send):
-                        #     self.send_queue[0] = data_to_send[bytes_sent:]
-                        #     pass
-                        # else:
-                        #     self.send_queue.pop(0)
-                        self.send_queue.pop(0)
+                        if bytes_sent < len(data_to_send):
+                            self.send_queue[0] = data_to_send[bytes_sent:]
+                            pass
+                        else:
+                            self.send_queue.pop(0)
 
                         if not self.send_queue:
                             self.sockets.modSocket(fd, select.POLLIN)
@@ -110,6 +108,9 @@ class Client:
 
     def add_to_send(self, data):
         self.send_queue.append(data)
+        if self.client_connected:
+            self.sockets.modSocket(self.clientSocket.fileno(), select.POLLOUT | select.POLLIN)
+
 
     def prepare(self):
         # self.clientSocket = self.getClientSocket(self.PORT)
