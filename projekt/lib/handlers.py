@@ -14,7 +14,7 @@ def camera_handler(fd, sockets, camera_payload_size,
 
     while len(data) < camera_payload_size:
         print('1st loop')
-        packet = sock.recv(camera_payload_size)
+        packet = sock.recv(len(data) - camera_payload_size)
         if not packet: break
         data += packet
 
