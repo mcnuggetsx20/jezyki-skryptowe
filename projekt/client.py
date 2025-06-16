@@ -29,6 +29,7 @@ class Client:
     def getClientSocket(self, port) -> socket.socket:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
+        sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
         sock.setblocking(False)
 
         # tutaj bindujemy pomimo tego ze jest pozniej

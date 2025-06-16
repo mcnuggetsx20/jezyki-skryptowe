@@ -3,6 +3,7 @@ import select
 import struct
 import pickle
 import cv2
+import numpy as np
 
 import lib.SockArr as sa
 
@@ -19,6 +20,7 @@ def getListeningSocket(port) -> socket.socket:
 
     #zeby sie nie blokowalo, bo sa bugi czasem
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
+    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
     sock.bind(('', port))
     sock.listen()
@@ -119,8 +121,10 @@ if __name__ == '__main__':
                 frame_data = data[:size]
                 data = data[size:]    
 
-                frame = pickle.loads(frame_data)
-                frame = cv2.imdecode(frame, 1)
+                nparr = np.frombuffer(frame_data, dtype=np.uint8)
+                frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                # frame = pickle.loads(frame_data)
+                # frame = cv2.imdecode(frame, 1)
 
                 cv2.imshow('Klient', frame)
                 cv2.waitKey(1)
