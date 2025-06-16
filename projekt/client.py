@@ -68,7 +68,7 @@ class Client:
                         self.client_connected = True
 
                         id_bytes = self.identity.encode('utf-8')
-                        msg = struct.pack('BBB', COMMAND_IDENTIFY, self._type, len(id_bytes)) + id_bytes
+                        msg = struct.pack('!BBB', COMMAND_IDENTIFY, self._type, len(id_bytes)) + id_bytes
 
                         current_socket.send(msg) #informacja o tym kim jestesmy
                     continue

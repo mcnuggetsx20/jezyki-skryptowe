@@ -72,7 +72,7 @@ def main_loop():
                     sockets.rmSocket(fd)
                     continue
 
-                command = struct.unpack('B', data[:1])[0]
+                command = struct.unpack('!B', data[:1])[0]
                 print(command)
 
                 if command == COMMAND_IDENTIFY:
@@ -85,7 +85,7 @@ def main_loop():
                         current_socket.close()
                         sockets.rmSocket(fd)
 
-                    device_type,name_len = struct.unpack('BB', data[1:3])
+                    device_type,name_len = struct.unpack('!BB', data[1:3])
                     device_name_packed = data[3:]
 
                     while len(device_name_packed) < name_len:
