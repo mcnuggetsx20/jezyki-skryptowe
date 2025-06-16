@@ -28,18 +28,20 @@ if __name__ == '__main__':
     cl = client.Client()
     cl.prepare()
 
-    while True:
-        ret, frame = camera.read()
-        if not ret:
-            raise Exception("Failed to read frame!")
+    try:
+        while True:
+            ret, frame = camera.read()
+            if not ret:
+                raise Exception("Failed to read frame!")
 
-        if cl.client_connected:
-            _, encoded = cv2.imencode('.jpg', frame)
-            data = encoded.tobytes()
-            cl.add_to_send(struct.pack('!I', len(data)) + data)
+            if cl.client_connected:
+                _, encoded = cv2.imencode('.jpg', frame)
+                data = encoded.tobytes()
+                cl.add_to_send(struct.pack('!I', len(data)) + data)
 
 
-        cl.pollEvents(timeout=0)
-
-    camera.release()
-    cv2.destroyAllWindows()
+            cl.pollEvents(timeout=0)
+    except KeyboardInterrupt:
+        camera.release()
+        cv2.destroyAllWindows()
+        cl.cleanup()
