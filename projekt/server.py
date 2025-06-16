@@ -34,7 +34,7 @@ def main_loop():
     while True:
         events = sockets.poller.poll(1000) #1 sekunda
 
-        print('poll')
+        # print('poll')
         if not events: continue
 
         for fd, event in events:
@@ -44,7 +44,7 @@ def main_loop():
                 if event & select.POLLIN:
                     #mamy probe polaczenia
                     new_sock,_ = serverSocket.accept() #tu zamiast _ mozna zebrac adres
-                    sockets.addSocket(new_sock, events= select.POLLIN | select.select.POLLOUT)
+                    sockets.addSocket(new_sock, events= select.POLLIN | select.POLLOUT)
                     print('registered a new client')
 
             else:

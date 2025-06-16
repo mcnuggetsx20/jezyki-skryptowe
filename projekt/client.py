@@ -45,6 +45,9 @@ class Client:
 
     def pollEvents(self, timeout = 1000):
 
+        # to jest funkcja ktora wykonuje jedna iteracje normalnej petli eventow
+        # wysyla self.send_queue (jesli socket tcp jest gotowy)
+
         if self.client_connected and self.send_queue:
             self.sockets.modSocket(self.clientSocket.fileno(), select.POLLOUT | select.POLLIN)
 
@@ -139,10 +142,15 @@ class Client:
         self.send_queue.append(data)
 
     def cleanup(self):
+
+        #ta funkcja rozlacza socket tcp i czysci co trzeba,
+        # uzywac zawsze kiedy tcp sie wywala
+
         self.sockets.rmSocket(self.clientSocket.fileno())
         self.clientSocket.close()
         self.client_connected = False
         self.send_queue = list()
+        return
 
     def prepare(self):
         # self.clientSocket = self.getClientSocket(self.PORT)
