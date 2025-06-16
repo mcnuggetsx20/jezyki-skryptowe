@@ -1,11 +1,13 @@
 import socket
 import select
 import struct
-import pickle
 import cv2
 import numpy as np
 
+
+import collections
 import lib.SockArr as sa
+import time
 
 def getBroadcastSocket(port) -> socket.socket:
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -55,6 +57,8 @@ if __name__ == '__main__':
     max_msg_size = 4096
     MSG_FROM_SERVER = b'serverup'
     MAX_FRAME_SIZE = 10**6
+
+    frame_times = collections.deque(maxlen=30) 
 
     broadcastSocket = getBroadcastSocket(port)
     serverSocket = getListeningSocket(port)
@@ -123,9 +127,18 @@ if __name__ == '__main__':
 
                 nparr = np.frombuffer(frame_data, dtype=np.uint8)
                 frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-                # frame = pickle.loads(frame_data)
-                # frame = cv2.imdecode(frame, 1)
 
+                t1 = time.time()
                 cv2.imshow('Klient', frame)
                 cv2.waitKey(1)
+                t2 = time.time()
+                frame_times.append(t2 - t1)
+
+                if len(frame_times) == frame_times.maxlen:
+                    avg_frame_time = sum(frame_times) / len(frame_times)
+                    fps = 1.0 / avg_frame_time if avg_frame_time > 0 else 0
+                    print(f"Avg FPS (30 frames): {fps:.2f}")
+
+
+
 

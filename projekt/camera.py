@@ -1,5 +1,4 @@
 import cv2
-import pickle
 import client
 import struct
 
