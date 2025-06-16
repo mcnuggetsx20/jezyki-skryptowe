@@ -7,10 +7,40 @@ from collections import defaultdict
 def empty_handler():
     pass
 
+def identify_handler(fd, sockets):
+    data =b''
+    current_socket = sockets.getSocket(fd)
+    while len(data) < 3:
+        packet = current_socket.recv(3-len(data))
+        if not packet: break
+        data += packet
+
+    if len(data) < 3:
+        current_socket.close()
+        sockets.rmSocket(fd)
+
+    device_type,name_len = struct.unpack('!BB', data[1:3])
+    device_name_packed = data[3:]
+
+    while len(device_name_packed) < name_len:
+        packet = current_socket.recv(name_len - len(device_name_packed))
+        if not packet: break
+        device_name_packed += packet
+
+    if len(device_name_packed) < name_len:
+        current_socket.close()
+        sockets.rmSocket(fd)
+
+    device_name = device_name_packed.decode('utf-8')
+
+    print(device_type, name_len, device_name)
+    return
+
 def camera_handler(fd, sockets, camera_payload_size, 
                   MAX_FRAME_SIZE=10**6, max_msg_size = 4096):
     sock = sockets.getSocket(fd)
     data = b''
+    camera_payload_size = struct.calcsize('!I')
 
     while len(data) < camera_payload_size:
         print('1st loop')

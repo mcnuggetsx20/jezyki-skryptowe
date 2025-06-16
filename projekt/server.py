@@ -6,7 +6,7 @@ import numpy as np
 
 import collections
 import lib.SockArr as sa
-import lib.handlers as hdlrs
+import lib.handlers as hndlrs
 from lib.commands import *
 from lib.types import *
 
@@ -77,33 +77,10 @@ def main_loop():
                 print(f'command {command}')
 
                 if command == COMMAND_IDENTIFY:
-                    while len(data) < 3:
-                        packet = current_socket.recv(max_msg_size)
-                        if not packet: break
-                        data += packet
-
-                    if len(data) < 3:
-                        current_socket.close()
-                        sockets.rmSocket(fd)
-
-                    device_type,name_len = struct.unpack('!BB', data[1:3])
-                    device_name_packed = data[3:]
-
-                    while len(device_name_packed) < name_len:
-                        packet = current_socket.recv(max_msg_size)
-                        if not packet: break
-                        device_name_packed += packet
-
-                    if len(device_name_packed) < name_len:
-                        current_socket.close()
-                        sockets.rmSocket(fd)
-
-                    device_name = device_name_packed.decode('utf-8')
-
-                    print(command, device_type, name_len, device_name)
+                    hndlrs.identify_handler(fd, sockets)
                 
                 elif command == COMMAND_CAMERA_STREAM:
-                    hdlrs.camera_handler(fd, sockets, camera_payload_size)
+                    hndlrs.camera_handler(fd, sockets, camera_payload_size)
 
 if __name__ == '__main__':
     port = 3490
@@ -122,7 +99,6 @@ if __name__ == '__main__':
     # to jest sygnal ze se wstalismy
     broadcastSocket.sendto(MSG_FROM_SERVER, ('255.255.255.255', port))
 
-    camera_payload_size = struct.calcsize('!I')
 
     try:
         main_loop()
