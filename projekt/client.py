@@ -115,6 +115,10 @@ class Client:
     def add_to_send(self, data):
         self.send_queue.append(data)
 
+    def cleanup(self):
+        self.sockets.rmSocket(self.clientSocket.fileno())
+        self.clientSocket.close()
+
     def prepare(self):
         # self.clientSocket = self.getClientSocket(self.PORT)
 

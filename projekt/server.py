@@ -51,28 +51,8 @@ def getListeningSocket(port) -> socket.socket:
 #
 #     return sender
 
-
-if __name__ == '__main__':
-    port = 3490
-    max_msg_size = 4096
-    MSG_FROM_SERVER = b'serverup'
-    MAX_FRAME_SIZE = 10**6
-
-    frame_times = collections.deque(maxlen=30) 
-
-    broadcastSocket = getBroadcastSocket(port)
-    serverSocket = getListeningSocket(port)
-    sockets = sa.SockArr()
-
-    sockets.addSocket(serverSocket)
-
-    # to jest sygnal ze se wstalismy
-    broadcastSocket.sendto(MSG_FROM_SERVER, ('255.255.255.255', port))
-
-    camera_payload_size = struct.calcsize('!I')
-
+def main_loop():
     while True:
-
         events = sockets.poller.poll(1000) #1 sekunda
 
         print('poll')
@@ -131,6 +111,35 @@ if __name__ == '__main__':
 
                 cv2.imshow('Klient', frame)
                 cv2.waitKey(1)
+
+
+if __name__ == '__main__':
+    port = 3490
+    max_msg_size = 4096
+    MSG_FROM_SERVER = b'serverup'
+    MAX_FRAME_SIZE = 10**6
+
+    frame_times = collections.deque(maxlen=30) 
+
+    broadcastSocket = getBroadcastSocket(port)
+    serverSocket = getListeningSocket(port)
+    sockets = sa.SockArr()
+
+    sockets.addSocket(serverSocket)
+
+    # to jest sygnal ze se wstalismy
+    broadcastSocket.sendto(MSG_FROM_SERVER, ('255.255.255.255', port))
+
+    camera_payload_size = struct.calcsize('!I')
+
+    try:
+        main_loop()
+    except KeyboardInterrupt:
+        cv2.destroyAllWindows()
+        serverSocket.close()
+        broadcastSocket.close()
+
+
 
 
 
