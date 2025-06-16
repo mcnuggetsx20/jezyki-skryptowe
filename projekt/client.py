@@ -65,14 +65,17 @@ class Client:
 
                 if self.client_connected:
                     if event & select.POLLIN:
-                        msg, _ = current_socket.recv(self.MSG_SIZE)
-                        if msg:
-                            pass
-                        else:
-                            # tutaj nam sie tcp rozlaczyl
-                            self.client_connected = False
-                            current_socket.close()
-                            self.sockets.rmSocket(fd)
+                        try:
+                            msg, _ = current_socket.recv(self.MSG_SIZE)
+                            if msg:
+                                pass
+                            else:
+                                # tutaj nam sie tcp rozlaczyl
+                                self.cleanup()
+
+                        except BlockingIOError: pass
+                        except ConnectionResetError:
+                            self.cleanup()
 
                     elif (event & select.POLLOUT) and self.send_queue:
                         data_to_send = self.send_queue[0]
@@ -118,6 +121,7 @@ class Client:
     def cleanup(self):
         self.sockets.rmSocket(self.clientSocket.fileno())
         self.clientSocket.close()
+        self.client_connected = False
 
     def prepare(self):
         # self.clientSocket = self.getClientSocket(self.PORT)

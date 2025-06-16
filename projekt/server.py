@@ -79,10 +79,13 @@ def main_loop():
                     if not packet: break
                     data += packet
 
-                if not data:
+                if len(data) < camera_payload_size:
                     #to znaczy ze sie odlaczyl
                     sockets.rmSocket(fd)
                     print('a client disconnected')
+                    cv2.destroyAllWindows()
+
+                    continue
 
                 packed_size = data[:camera_payload_size]
                 data = data[camera_payload_size:]
