@@ -6,7 +6,7 @@ class SockArr:
         self.sock_dct = dict()
         self.poller = select.poll()
 
-        self.props = defaultdict(lambda: {'id': None, 'name' : None})
+        self.props = defaultdict(lambda: {'type': None, 'name' : None})
 
         return
 
@@ -31,12 +31,12 @@ class SockArr:
         self.poller.modify(fd, events)
         return
 
-    def setId(self, fd, id):
-        self.props[fd]['id'] = id
+    def setType(self, fd, id):
+        self.props[fd]['type'] = id
         return
 
-    def getId(self, fd):
-        return self.props[fd]['id']
+    def getType(self, fd):
+        return self.props[fd]['type']
 
     def setName(self, fd, name):
         self.props[fd]['name'] = name

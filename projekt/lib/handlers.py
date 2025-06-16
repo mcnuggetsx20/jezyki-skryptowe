@@ -41,13 +41,13 @@ def identify_handler(fd, sockets) -> bool:
 
     print(device_type, name_len, device_name)
 
-    sockets.setId(fd, device_type)
+    sockets.setType(fd, device_type)
     sockets.setName(fd, device_name)
 
     return True
 
 def camera_handler(fd, sockets, 
-                  MAX_FRAME_SIZE=10**6, max_msg_size = 4096) -> bool:
+                  MAX_FRAME_SIZE=10**6, max_msg_size = 4096):
 
     # to jest funkcja sluzaca do obslugi 
     # komendy COMMAND_CAMERA_STREAM
@@ -71,7 +71,7 @@ def camera_handler(fd, sockets,
         print('a client disconnected')
         cv2.destroyAllWindows()
 
-        return False
+        return None
 
     packed_size = data[:camera_payload_size]
     data = data[camera_payload_size:]
@@ -80,7 +80,7 @@ def camera_handler(fd, sockets,
     if size > MAX_FRAME_SIZE: 
         print('exceeded max frame size')
         print(size)
-        return False
+        return None
 
     while len(data) < size:
         # print('2nd loop', len(data), size)
@@ -94,7 +94,7 @@ def camera_handler(fd, sockets,
         sockets.rmSocket(fd)
         print('a client disconnected')
         cv2.destroyAllWindows()
-        return False
+        return None
 
     frame_data = data[:size]
     data = data[size:]    
@@ -102,7 +102,4 @@ def camera_handler(fd, sockets,
     nparr = np.frombuffer(frame_data, dtype=np.uint8)
     frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-    cv2.imshow('Klient', frame)
-    cv2.waitKey(1)
-
-    return True
+    return frame
