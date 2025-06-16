@@ -88,12 +88,18 @@ class Client:
                             self.cleanup()
 
                     elif (event & select.POLLOUT) and self.send_queue:
-                        data_to_send = self.send_queue[0]
+
+                        header = self.send_queue[0]['header']
+                        data = self.send_queue[0]['data']
+                        format = self.send_queue[0]['format']
+
+                        data_to_send = struct.pack(format, header, len(data)) + data
+
                         bytes_sent = current_socket.send(data_to_send)
                         print(time.time(), len(data_to_send), bytes_sent)
 
                         if bytes_sent < len(data_to_send):
-                            self.send_queue[0] = data_to_send[bytes_sent:]
+                            self.send_queue[0]['data'] = data_to_send[bytes_sent:]
                             pass
                         else:
                             self.send_queue.pop(0)
@@ -126,8 +132,13 @@ class Client:
 
         return
 
-    def add_to_send(self, data):
+    def add_to_send(self, data, header, format):
         self.send_queue.append(data)
+        self.send_queue.append({
+            'header': header,
+            'data' : data,
+            'format': format
+            })
 
     def cleanup(self):
         self.sockets.rmSocket(self.clientSocket.fileno())
