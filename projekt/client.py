@@ -59,9 +59,7 @@ class Client:
                 if not self.client_connected and (event & select.POLLOUT):
                     err = current_socket.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
                     if err:
-                        current_socket.close()
-                        self.sockets.rmSocket(fd)
-                        self.client_connected = False
+                        self.cleanup()
                     else:
                         print('established a tcp connection')
                         self.sockets.modSocket(fd, select.POLLIN | select.POLLOUT)
@@ -102,7 +100,6 @@ class Client:
                         if bytes_sent < len(data_to_send):
                             # self.send_queue[0]['data'] = data_to_send[bytes_sent:]
                             self.send_queue[0] = data_to_send[bytes_sent:]
-                            pass
                         else:
                             self.send_queue.pop(0)
 
@@ -146,6 +143,7 @@ class Client:
         self.sockets.rmSocket(self.clientSocket.fileno())
         self.clientSocket.close()
         self.client_connected = False
+        self.send_queue = list()
 
     def prepare(self):
         # self.clientSocket = self.getClientSocket(self.PORT)

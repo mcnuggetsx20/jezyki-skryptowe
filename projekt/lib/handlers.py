@@ -31,6 +31,7 @@ def camera_handler(fd, sockets, camera_payload_size,
 
     size= struct.unpack('!I', packed_size)[0]
     if size > MAX_FRAME_SIZE: 
+        print('exceeded max frame size')
         return
 
     while len(data) < size:
