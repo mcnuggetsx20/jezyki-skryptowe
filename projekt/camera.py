@@ -40,13 +40,13 @@ if __name__ == '__main__':
             if cl.client_connected:
                 _, encoded = cv2.imencode('.jpg', frame)
                 data = encoded.tobytes()
-                # cl.add_to_send(struct.pack('!BI', 
-                #     COMMAND_CAMERA_STREAM, len(data)) + data)
-                cl.add_to_send(
-                    header=COMMAND_CAMERA_STREAM,
-                    data = data,
-                    format = '!BI'
-                )
+                cl.add_to_send(struct.pack('!BI', 
+                    COMMAND_CAMERA_STREAM, len(data)) + data)
+                # cl.add_to_send(
+                #     header=COMMAND_CAMERA_STREAM,
+                #     data = data,
+                #     format = '!BI'
+                # )
 
 
             cl.pollEvents(timeout=0)

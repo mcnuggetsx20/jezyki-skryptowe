@@ -73,7 +73,7 @@ def main_loop():
                     continue
 
                 command = struct.unpack('!B', data[:1])[0]
-                print(command)
+                print(f'command {command}')
 
                 if command == COMMAND_IDENTIFY:
                     while len(data) < 3:
