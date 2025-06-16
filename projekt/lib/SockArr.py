@@ -1,5 +1,6 @@
 import select
-import handlers
+
+from . import handlers
 
 class SockArr:
     def __init__(self):
