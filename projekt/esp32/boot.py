@@ -9,6 +9,10 @@ def save_wifi_credentials(ssid, password):
     with open("wifi.txt", "w") as f:
         f.write(f"{ssid}\n{password}")
 
+def save_name(name):
+    with open("name.txt", "w") as f:
+        f.write(name)
+
 def load_wifi_credentials():
     try:
         with open("wifi.txt", "r") as f:
@@ -85,6 +89,8 @@ def serve_config_page():
                     print(ssid)
                     print(password)
                     print(name)
+                    save_wifi_credentials(ssid,password)
+                    save_name(name)
                     cl.send("HTTP/1.1 200 OK\r\n\r\nDane zapisane. Restart...")
                     cl.close()
                     time.sleep(3)
@@ -106,9 +112,7 @@ def run_normal_mode():
     print("🎯 Tryb normalny – tu możesz uruchomić swoją aplikację!")
     # np. rozpocznij odczyt sensorów, uruchom serwer itp.
     # Póki co tylko print co 2 sekundy:
-    while True:
-        print("🏠 System działa, połączony z Wi-Fi")
-        time.sleep(2)
+    print("🏠 System działa, połączony z Wi-Fi")
 
 def main():
     ssid, password = load_wifi_credentials()

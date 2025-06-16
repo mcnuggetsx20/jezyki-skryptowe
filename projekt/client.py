@@ -8,7 +8,7 @@ from lib.commands import *
 from lib.types import *
 
 class Client:
-    def __init__(self, tp, identity):
+    def __init__(self, tp, identity, input_handler=None):
         self.clientSocket = None
         self.serverInfo = (None, None)
         self.sockets = sa.SockArr()
@@ -22,7 +22,8 @@ class Client:
         self.PORT = 3490
         self.MSG_FROM_SERVER = b'serverup'
 
-        return;
+        self.input_handler = input_handler
+        return
 
     def getDgramSocket(self, port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -76,6 +77,8 @@ class Client:
                         try:
                             msg, _ = current_socket.recv(self.MSG_SIZE)
                             if msg:
+                                if self.input_handler:
+                                    self.input_handler.handle_data(msg)
                                 pass
                             else:
                                 # tutaj nam sie tcp rozlaczyl
