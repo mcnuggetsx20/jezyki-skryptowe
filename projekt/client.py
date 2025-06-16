@@ -97,10 +97,11 @@ class Client:
                 # my go uzywamy tylko do laczenia sie z serwerem
                 # wiec jesli nie potrzebujemy polaczenia 
                 # (bo np je juz mamy) to elo
-                print(f'else {fd}')
+                print(f'udp enter')
 
 
                 if self.clientSocket: return
+                print(f'udp recv')
 
                 msg, sender = current_socket.recvfrom(self.MSG_SIZE)
 
