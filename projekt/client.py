@@ -1,11 +1,14 @@
 import socket
 import select
+import struct
 import time
 
 import lib.SockArr as sa
+from lib.commands import *
+from lib.types import *
 
 class Client:
-    def __init__(self, identity):
+    def __init__(self, _type, identity):
         self.clientSocket = None
         self.serverInfo = (None, None)
         self.sockets = sa.SockArr()
@@ -13,6 +16,7 @@ class Client:
 
         self.send_queue = list()
         self.identity = identity
+        self._type = _type
 
         self.MSG_SIZE = 1024
         self.PORT = 3490
@@ -62,7 +66,11 @@ class Client:
                         print('established a tcp connection')
                         self.sockets.modSocket(fd, select.POLLIN | select.POLLOUT)
                         self.client_connected = True
-                        current_socket.send(self.identity) #informacja o tym kim jestesmy
+
+                        id_bytes = self.identity.encode('utf-8')
+                        msg = struct.pack('BBB', COMMAND_IDENTIFY, self._type, len(id_bytes)) + id_bytes
+
+                        current_socket.send(msg) #informacja o tym kim jestesmy
                     continue
 
                 if self.client_connected:

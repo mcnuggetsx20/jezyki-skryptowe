@@ -1,0 +1,2 @@
+TYPE_CAMERA = 0
+TYPE_LED = 1

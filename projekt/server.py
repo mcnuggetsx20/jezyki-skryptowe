@@ -4,10 +4,11 @@ import struct
 import cv2
 import numpy as np
 
-
 import collections
 import lib.SockArr as sa
 import lib.handlers as hdlrs
+from lib.commands import *
+from lib.types import *
 
 def getBroadcastSocket(port) -> socket.socket:
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -29,7 +30,6 @@ def getListeningSocket(port) -> socket.socket:
 
     return sock
 
-
 def main_loop():
     while True:
         events = sockets.poller.poll(1000) #1 sekunda
@@ -49,16 +49,44 @@ def main_loop():
 
             else:
                 #jeden z klientow cos od nas chce
-                if sockets.getId(fd) == None:
-                    msg = current_socket.recv(10)
-                    if msg:
-                        sockets.setId(fd, msg)
+                # if sockets.getId(fd) == None:
+                #     msg = current_socket.recv(10)
+                #     if msg:
+                #         sockets.setId(fd, msg)
+                #
+                # elif sockets.getId(fd) == b'cam':
+                #     hdlrs.camera_handler(fd, sockets, camera_payload_size)
+                #
+                # else:
+                #     pass
 
-                elif sockets.getId(fd) == b'cam':
-                    hdlrs.camera_handler(fd, sockets, camera_payload_size)
+                data = b''
+                # 3, bo dajemy komende, typ, dlugosc nazwy
+                while len(data) < 3:
+                    packet = current_socket.recv(max_msg_size)
+                    if not packet: break
+                    data += packet
 
-                else:
-                    pass
+                if len(data) < 3:
+                    current_socket.close()
+                    sockets.rmSocket(fd)
+
+                command, device_type,name_len = struct.unpack('BBB', data[:3])
+                device_name_packed = data[3:]
+
+                while len(device_name_packed) < name_len:
+                    packet = current_socket.recv(max_msg_size)
+                    if not packet: break
+                    device_name_packed += packet
+
+                if len(device_name_packed) < name_len:
+                    current_socket.close()
+                    sockets.rmSocket(fd)
+
+                device_name = device_name_packed.decode('utf-8')
+
+                print(command, device_type, name_len, device_name)
+
 
 
 
