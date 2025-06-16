@@ -7,7 +7,7 @@ from collections import defaultdict
 def empty_handler():
     pass
 
-def identify_handler(fd, sockets) -> bool:
+def identify_handler(fd, sockets):
 
     # to jest funkcja do obslugi 
     # komendy COMMAND_IDENTIFY (identyfikacja urzadzen)
@@ -20,9 +20,7 @@ def identify_handler(fd, sockets) -> bool:
         data += packet
 
     if len(data) < 2:
-        current_socket.close()
-        sockets.rmSocket(fd)
-        return False
+        return None
 
     device_type,name_len = struct.unpack('!BB', data[:2])
     device_name_packed = data[2:]
@@ -33,9 +31,7 @@ def identify_handler(fd, sockets) -> bool:
         device_name_packed += packet
 
     if len(device_name_packed) < name_len:
-        current_socket.close()
-        sockets.rmSocket(fd)
-        return False
+        return None
 
     device_name = device_name_packed.decode('utf-8')
 
@@ -67,7 +63,6 @@ def camera_handler(fd, sockets,
 
     if len(data) < camera_payload_size:
         #to znaczy ze sie odlaczyl
-        sockets.rmSocket(fd)
         print('a client disconnected')
         cv2.destroyAllWindows()
 
@@ -91,7 +86,6 @@ def camera_handler(fd, sockets,
 
     if not data:
         #to znaczy ze sie odlaczyl
-        sockets.rmSocket(fd)
         print('a client disconnected')
         cv2.destroyAllWindows()
         return None

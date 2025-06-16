@@ -4,7 +4,7 @@ import struct
 import cv2
 import numpy as np
 
-import collections
+from collections import defaultdict
 import lib.SockArr as sa
 import lib.handlers as hndlrs
 from lib.commands import *
@@ -16,7 +16,6 @@ class Server:
         self.port = 3490
         self.MSG_FROM_SERVER = b'serverup'
 
-        frame_times = collections.deque(maxlen=30) 
 
         self.broadcastSocket = self.getBroadcastSocket(self.port)
         self.serverSocket = self.getListeningSocket(self.port)
@@ -25,7 +24,7 @@ class Server:
         self.sockets.addSocket(self.serverSocket)
 
         # to jest sygnal ze se wstalismy
-        self.send_queue = list()
+        self.send_queue = defaultdict(lambda: list())
         self.recv_queue = list()
 
         return
@@ -54,10 +53,19 @@ class Server:
 
         return sock
 
+    def clean(self, fd):
+        self.sockets.getSocket(fd).close()
+        self.sockets.rmSocket(fd)
+        del self.send_queue[fd]
+        return
+
     def main_loop(self):
         try:
             while True:
                 events = self.sockets.poller.poll(1000) #1 sekunda
+                for i in self.send_queue.keys():
+                    if self.send_queue[i]:
+
 
                 # print('poll')
                 if not events: continue
@@ -94,8 +102,7 @@ class Server:
                                 data += packet
 
                             if len(data) < 1:
-                                current_socket.close()
-                                self.sockets.rmSocket(fd)
+                                self.clean(fd)
                                 continue
 
                             print(len(data))
@@ -103,15 +110,39 @@ class Server:
                             print(f'command {command}')
 
                             if command == COMMAND_IDENTIFY:
-                                hndlrs.identify_handler(fd, self.sockets)
+                                if hndlrs.identify_handler(fd, self.sockets) == None:
+                                    self.clean(fd)
                             
                             elif command == COMMAND_CAMERA_STREAM:
                                 frame = hndlrs.camera_handler(fd, self.sockets)
-                                self.recv_queue.append({
-                                    'fd': fd,
-                                    'command': COMMAND_CAMERA_STREAM,
-                                    'data': frame,
-                                })
+
+                                if frame == None:
+                                    self.clean(fd)
+
+                                else:
+                                    self.recv_queue.append({
+                                        'fd': fd,
+                                        'command': COMMAND_CAMERA_STREAM,
+                                        'data': frame,
+                                    })
+
+                        elif event & select.POLLOUT:
+                            if not self.send_queue[fd]: continue
+
+                            data_to_send = self.send_queue[fd][0]
+
+                            bytes_sent = current_socket.send(data_to_send)
+
+                            if bytes_sent < len(data_to_send):
+                                self.send_queue[fd][0] = data_to_send[bytes_sent:]
+                            else:
+                                self.send_queue[fd].pop(0)
+
+                            if not self.send_queue:
+                                self.sockets.modSocket(fd, select.POLLIN)
+
+
+
 
         except KeyboardInterrupt:
             cv2.destroyAllWindows()
@@ -119,10 +150,7 @@ class Server:
             self.broadcastSocket.close()
 
     def add_to_send(self, fd, data):
-        self.send_queue.append({
-            'fd': fd,
-            'data': data,
-        })
+        self.send_queue[fd].append(data)
 
         return
     
