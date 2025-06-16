@@ -37,6 +37,7 @@ if __name__ == '__main__':
         if cl.client_connected:
             _, encoded = cv2.imencode('.jpg', frame)
             data = pickle.dumps(encoded)
+            print(f'pickle length: {len(data)}')
             cl.add_to_send(struct.pack('!I', len(data)) + data)
 
 

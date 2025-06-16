@@ -62,7 +62,7 @@ if __name__ == '__main__':
     # to jest sygnal ze se wstalismy
     broadcastSocket.sendto(MSG_FROM_SERVER, ('255.255.255.255', port))
 
-    camera_payload_size = struct.calcsize('L')
+    camera_payload_size = struct.calcsize('!I')
 
     while True:
 
@@ -102,7 +102,7 @@ if __name__ == '__main__':
                 size= struct.unpack('!I', packed_size)[0]
 
                 while len(data) < size:
-                    print('2nd loop', len(data), size)
+                    # print('2nd loop', len(data), size)
                     packet = sock.recv(max_msg_size)
                     if not packet: break
                     data += packet
