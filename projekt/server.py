@@ -7,7 +7,6 @@ import numpy as np
 
 import collections
 import lib.SockArr as sa
-import time
 
 def getBroadcastSocket(port) -> socket.socket:
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -29,27 +28,6 @@ def getListeningSocket(port) -> socket.socket:
 
     return sock
 
-# def findServer(port):
-#     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-#     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, True)
-#
-#     sock.settimeout(1)
-#
-#     while True:
-#         sock.sendto(b"a", ('255.255.255.255', port))
-#         print('scanning local network...')
-#
-#         try:
-#             msg, sender = sock.recvfrom(1024)
-#
-#         except socket.timeout:
-#             continue
-#
-#         break
-#
-#     sock.close()
-#
-#     return sender
 
 def main_loop():
     while True:
@@ -70,50 +48,8 @@ def main_loop():
 
             else:
                 #jeden z klientow cos od nas chce
+                sockets.getHandler(fd)(fd, sockets, camera_payload_size)
 
-                sock = sockets.getSocket(fd)
-                data = b''
-                while len(data) < camera_payload_size:
-                    print('1st loop')
-                    packet = sock.recv(max_msg_size)
-                    if not packet: break
-                    data += packet
-
-                if len(data) < camera_payload_size:
-                    #to znaczy ze sie odlaczyl
-                    sockets.rmSocket(fd)
-                    print('a client disconnected')
-                    cv2.destroyAllWindows()
-
-                    continue
-
-                packed_size = data[:camera_payload_size]
-                data = data[camera_payload_size:]
-
-                size= struct.unpack('!I', packed_size)[0]
-                if size > MAX_FRAME_SIZE: 
-                    continue
-
-                while len(data) < size:
-                    # print('2nd loop', len(data), size)
-
-                    packet = sock.recv(max_msg_size)
-                    if not packet: break
-                    data += packet
-
-                if not data:
-                    #to znaczy ze sie odlaczyl
-                    sockets.rmSocket(fd)
-                    print('a client disconnected')
-
-                frame_data = data[:size]
-                data = data[size:]    
-
-                nparr = np.frombuffer(frame_data, dtype=np.uint8)
-                frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
-                cv2.imshow('Klient', frame)
-                cv2.waitKey(1)
 
 
 if __name__ == '__main__':

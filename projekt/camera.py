@@ -25,7 +25,7 @@ def getCam(device : int | str = 0) -> tuple[cv2.VideoCapture, int, int]:
 
 if __name__ == '__main__':
     camera, width, height = getCam()
-    cl = client.Client()
+    cl = client.Client('cam')
     cl.prepare()
 
     try:

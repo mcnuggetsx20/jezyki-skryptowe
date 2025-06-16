@@ -5,13 +5,14 @@ import time
 import lib.SockArr as sa
 
 class Client:
-    def __init__(self):
+    def __init__(self, identity):
         self.clientSocket = None
         self.serverInfo = (None, None)
         self.sockets = sa.SockArr()
         self.client_connected = False
 
         self.send_queue = list()
+        self.identity = identity
 
         self.MSG_SIZE = 1024
         self.PORT = 3490
@@ -61,6 +62,7 @@ class Client:
                         print('established a tcp connection')
                         self.sockets.modSocket(fd, select.POLLIN | select.POLLOUT)
                         self.client_connected = True
+                        current_socket.send(self.identity) #informacja o tym kim jestesmy
                     continue
 
                 if self.client_connected:
@@ -74,7 +76,7 @@ class Client:
                                 self.cleanup()
 
                         except BlockingIOError: pass
-                        except ConnectionResetError:
+                        except (ConnectionResetError, ValueError):
                             self.cleanup()
 
                     elif (event & select.POLLOUT) and self.send_queue:
@@ -100,7 +102,7 @@ class Client:
                 print(f'udp enter')
 
 
-                if self.clientSocket: return
+                if self.client_connected: return
                 print(f'udp recv')
 
                 msg, sender = current_socket.recvfrom(self.MSG_SIZE)
