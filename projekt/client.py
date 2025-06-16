@@ -75,11 +75,19 @@ class Client:
                     if event & select.POLLIN:
                         try:
                             msg, _ = current_socket.recv(self.MSG_SIZE)
-                            if msg:
-                                pass
-                            else:
-                                # tutaj nam sie tcp rozlaczyl
+                            data = b''
+                            #najpierw odbieramy tylko typ komendy
+                            while len(data) < 1:
+                                packet = current_socket.recv(1)
+                                if not packet: break
+                                data += packet
+
+                            if len(data) < 1:
                                 self.cleanup()
+                                continue
+
+                            command = struct.unpack('!B', data[:1])[0]
+                            #if command == COMMAND_STH
 
                         except BlockingIOError: pass
                         except (ConnectionResetError, ValueError):
