@@ -36,7 +36,7 @@ def identify_handler(fd, sockets):
     print(device_type, name_len, device_name)
     return
 
-def camera_handler(fd, sockets, camera_payload_size, 
+def camera_handler(fd, sockets, 
                   MAX_FRAME_SIZE=10**6, max_msg_size = 4096):
     sock = sockets.getSocket(fd)
     data = b''

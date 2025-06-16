@@ -80,7 +80,7 @@ def main_loop():
                     hndlrs.identify_handler(fd, sockets)
                 
                 elif command == COMMAND_CAMERA_STREAM:
-                    hndlrs.camera_handler(fd, sockets, camera_payload_size)
+                    hndlrs.camera_handler(fd, sockets)
 
 if __name__ == '__main__':
     port = 3490
