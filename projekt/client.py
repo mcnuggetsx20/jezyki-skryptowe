@@ -39,6 +39,10 @@ class Client:
         return sock
 
     def pollEvents(self, timeout = 1000):
+
+        if self.client_connected and self.send_queue:
+            self.sockets.modSocket(self.clientSocket.fileno(), select.POLLOUT | select.POLLIN)
+
         events = self.sockets.poller.poll(timeout)
         # if not events: return
 
@@ -106,16 +110,10 @@ class Client:
 
                     self.sockets.addSocket(self.clientSocket, events=select.POLLOUT)
 
-        if self.client_connected:
-            self.sockets.modSocket(self.clientSocket.fileno(), select.POLLOUT | select.POLLIN)
-
         return
 
     def add_to_send(self, data):
         self.send_queue.append(data)
-        if self.client_connected:
-            self.sockets.modSocket(self.clientSocket.fileno(), select.POLLOUT | select.POLLIN)
-
 
     def prepare(self):
         # self.clientSocket = self.getClientSocket(self.PORT)

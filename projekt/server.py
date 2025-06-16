@@ -90,6 +90,7 @@ if __name__ == '__main__':
 
             else:
                 #jeden z klientow cos od nas chce
+
                 sock = sockets.getSocket(fd)
                 data = b''
                 while len(data) < camera_payload_size:
@@ -128,16 +129,9 @@ if __name__ == '__main__':
                 nparr = np.frombuffer(frame_data, dtype=np.uint8)
                 frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-                t1 = time.time()
                 cv2.imshow('Klient', frame)
                 cv2.waitKey(1)
-                t2 = time.time()
-                frame_times.append(t2 - t1)
 
-                if len(frame_times) == frame_times.maxlen:
-                    avg_frame_time = sum(frame_times) / len(frame_times)
-                    fps = 1.0 / avg_frame_time if avg_frame_time > 0 else 0
-                    print(f"Avg FPS (30 frames): {fps:.2f}")
 
 
 
