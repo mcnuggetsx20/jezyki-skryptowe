@@ -7,20 +7,25 @@ from collections import defaultdict
 def empty_handler():
     pass
 
-def identify_handler(fd, sockets):
+def identify_handler(fd, sockets) -> bool:
+
+    # to jest funkcja do obslugi 
+    # komendy COMMAND_IDENTIFY (identyfikacja urzadzen)
+
     data =b''
     current_socket = sockets.getSocket(fd)
-    while len(data) < 3:
-        packet = current_socket.recv(3-len(data))
+    while len(data) < 2:
+        packet = current_socket.recv(2-len(data))
         if not packet: break
         data += packet
 
-    if len(data) < 3:
+    if len(data) < 2:
         current_socket.close()
         sockets.rmSocket(fd)
+        return False
 
-    device_type,name_len = struct.unpack('!BB', data[1:3])
-    device_name_packed = data[3:]
+    device_type,name_len = struct.unpack('!BB', data[:2])
+    device_name_packed = data[2:]
 
     while len(device_name_packed) < name_len:
         packet = current_socket.recv(name_len - len(device_name_packed))
@@ -30,21 +35,33 @@ def identify_handler(fd, sockets):
     if len(device_name_packed) < name_len:
         current_socket.close()
         sockets.rmSocket(fd)
+        return False
 
     device_name = device_name_packed.decode('utf-8')
 
     print(device_type, name_len, device_name)
-    return
+
+    sockets.setId(fd, device_type)
+    sockets.setName(fd, device_name)
+
+    return True
 
 def camera_handler(fd, sockets, 
-                  MAX_FRAME_SIZE=10**6, max_msg_size = 4096):
+                  MAX_FRAME_SIZE=10**6, max_msg_size = 4096) -> bool:
+
+    # to jest funkcja sluzaca do obslugi 
+    # komendy COMMAND_CAMERA_STREAM
+
+    # spodziewa sie !I bajtow rozmiaru klatki
+    # a potem samej klatki (o podanym rozmiarze)
+
     sock = sockets.getSocket(fd)
     data = b''
     camera_payload_size = struct.calcsize('!I')
 
     while len(data) < camera_payload_size:
         print('1st loop')
-        packet = sock.recv(len(data) - camera_payload_size)
+        packet = sock.recv(camera_payload_size - len(data))
         if not packet: break
         data += packet
 
@@ -54,17 +71,16 @@ def camera_handler(fd, sockets,
         print('a client disconnected')
         cv2.destroyAllWindows()
 
-        return
+        return False
 
     packed_size = data[:camera_payload_size]
     data = data[camera_payload_size:]
 
     size= struct.unpack('!I', packed_size)[0]
-    print(struct.unpack('!I', packed_size))
     if size > MAX_FRAME_SIZE: 
         print('exceeded max frame size')
         print(size)
-        return
+        return False
 
     while len(data) < size:
         # print('2nd loop', len(data), size)
@@ -77,6 +93,8 @@ def camera_handler(fd, sockets,
         #to znaczy ze sie odlaczyl
         sockets.rmSocket(fd)
         print('a client disconnected')
+        cv2.destroyAllWindows()
+        return False
 
     frame_data = data[:size]
     data = data[size:]    
@@ -87,4 +105,4 @@ def camera_handler(fd, sockets,
     cv2.imshow('Klient', frame)
     cv2.waitKey(1)
 
-    return
+    return True
