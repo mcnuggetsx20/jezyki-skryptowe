@@ -2,6 +2,8 @@ import cv2
 import client
 import struct
 
+from lib.types import *
+
 def getCam(device : int | str = 0) -> tuple[cv2.VideoCapture, int, int]:
     camera = cv2.VideoCapture(device)
 
@@ -25,7 +27,7 @@ def getCam(device : int | str = 0) -> tuple[cv2.VideoCapture, int, int]:
 
 if __name__ == '__main__':
     camera, width, height = getCam()
-    cl = client.Client(b'cam')
+    cl = client.Client(tp=TYPE_CAMERA, identity='kamerka')
     cl.prepare()
 
     try:

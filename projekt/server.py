@@ -87,9 +87,6 @@ def main_loop():
 
                 print(command, device_type, name_len, device_name)
 
-
-
-
 if __name__ == '__main__':
     port = 3490
     max_msg_size = 4096

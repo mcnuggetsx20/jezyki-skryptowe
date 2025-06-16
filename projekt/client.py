@@ -8,7 +8,7 @@ from lib.commands import *
 from lib.types import *
 
 class Client:
-    def __init__(self, _type, identity):
+    def __init__(self, tp, identity):
         self.clientSocket = None
         self.serverInfo = (None, None)
         self.sockets = sa.SockArr()
@@ -16,7 +16,7 @@ class Client:
 
         self.send_queue = list()
         self.identity = identity
-        self._type = _type
+        self._type = tp
 
         self.MSG_SIZE = 1024
         self.PORT = 3490
