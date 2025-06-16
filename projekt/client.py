@@ -75,7 +75,8 @@ class Client:
                         bytes_sent = current_socket.send(data_to_send)
 
                         if bytes_sent < len(data_to_send):
-                            self.send_queue[0] = data_to_send[bytes_sent:]
+                            # self.send_queue[0] = data_to_send[bytes_sent:]
+                            pass
                         else:
                             self.send_queue.pop(0)
 
