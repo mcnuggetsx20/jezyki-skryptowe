@@ -101,6 +101,7 @@ if __name__ == '__main__':
 
                 size= struct.unpack('!I', packed_size)[0]
                 print(len(packed_size), size)
+                print(f'payload {camera_payload_size}')
 
                 while len(data) < size:
                     # print('2nd loop', len(data), size)
