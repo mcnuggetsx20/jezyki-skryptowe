@@ -137,7 +137,7 @@ class MenuBar(Frame):
         ttk.Button(win, text="Anuluj", command=win.destroy).pack(pady=5)
     
     def refresh_devices(self):
-        return
+        self.app.detect_devices_in_network()
     
     def go_back(self):
         self.app.go_to_menu()
