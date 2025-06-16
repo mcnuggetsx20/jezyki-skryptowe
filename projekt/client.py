@@ -122,10 +122,10 @@ class Client:
                 print(f'udp enter')
 
 
-                if self.client_connected: return
                 print(f'udp recv')
 
                 msg, sender = current_socket.recvfrom(self.MSG_SIZE)
+                if self.client_connected: return
 
                 if msg == self.MSG_FROM_SERVER:
                     self.clientSocket = self.getClientSocket(self.PORT)

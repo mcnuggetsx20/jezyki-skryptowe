@@ -13,7 +13,7 @@ from lib.types import *
 class Server:
 
     def __init__(self):
-        self.port = 3490
+        self.port = 3491
         self.MSG_FROM_SERVER = b'serverup'
 
         frame_times = collections.deque(maxlen=30) 
@@ -31,7 +31,7 @@ class Server:
         return
 
     def sendBroadcast(self):
-        self.broadcastSocket.sendto(self.MSG_FROM_SERVER, ('255.255.255.255', self.port))
+        self.broadcastSocket.sendto(self.MSG_FROM_SERVER, ('255.255.255.255', 3490))
         return
 
     def getBroadcastSocket(self,port) -> socket.socket:
