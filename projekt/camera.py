@@ -3,6 +3,7 @@ import client
 import struct
 
 from lib.types import *
+from lib.commands import *
 
 def getCam(device : int | str = 0) -> tuple[cv2.VideoCapture, int, int]:
     camera = cv2.VideoCapture(device)

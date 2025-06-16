@@ -70,8 +70,8 @@ def main_loop():
                 if len(data) < 1:
                     current_socket.close()
                     sockets.rmSocket(fd)
+                    continue
 
-                # command, device_type,name_len = struct.unpack('BBB', data[:3])
                 command = struct.unpack('B', data[:1])[0]
                 print(command)
 
@@ -101,7 +101,7 @@ def main_loop():
 
                     print(command, device_type, name_len, device_name)
                 
-                elif command = COMMAND_CAMERA_STREAM:
+                elif command == COMMAND_CAMERA_STREAM:
                     hdlrs.camera_handler(fd, sockets, camera_payload_size)
 
 if __name__ == '__main__':
