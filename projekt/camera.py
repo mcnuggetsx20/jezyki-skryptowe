@@ -38,7 +38,7 @@ if __name__ == '__main__':
             _, encoded = cv2.imencode('.jpg', frame)
             data = pickle.dumps(encoded)
             st = struct.pack('!I', len(data)) + data
-            print(len(st))
+            print(f'struct: {len(st)}')
             cl.add_to_send(st)
 
 
