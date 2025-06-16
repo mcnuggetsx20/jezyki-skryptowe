@@ -6,6 +6,7 @@ import json
 import time
 import operator
 import socket
+import threading
 
 
 # local imports
@@ -13,14 +14,24 @@ from menu_bar import MenuBar
 from camera_control_frame import CameraControlFrame
 from main_frame import MainFrame
 
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from server import Server
+
 ICON_PATHS = {
     "bulb": "icons/bulb.png",
     "camera": "icons/camera.png",
     "display": "icons/display.png"
 }
 
+TYPE_TO_NAME = {
+    1: 'camera',
+    2: 'bulb',
+    3: 'display'
+}
+
 class SmartHomeGUI(tk.Tk):
-    def __init__(self):
+    def __init__(self, server):
         super().__init__()
         self.title("Smart Home GUI")
         self.geometry("1024x768")
@@ -35,6 +46,10 @@ class SmartHomeGUI(tk.Tk):
         self.devices = []
 
         self.create_layout()
+
+        self.clear_buffer = True
+        self.server = server
+        self.after(500, self.update_devices_from_sockarr)
 
     def load_icons(self):
         for name, path in ICON_PATHS.items():
@@ -81,7 +96,7 @@ class SmartHomeGUI(tk.Tk):
             json.dump(data, f, indent=2)
     
     def detect_devices_in_network(self):
-        return
+        self.server.sendBroadcast()
     
     def go_to_menu(self):
         # Usuwanie panelu urzadzenia
@@ -94,6 +109,38 @@ class SmartHomeGUI(tk.Tk):
         if self.main_frame:
             self.main_frame.pack(fill="both", expand=True)
 
+    def update_devices_from_sockarr(self):
+        sockarr = self.server.sockets
+        for fd, sock in sockarr.sock_dct.items():
+            name = sockarr.getName(fd)
+            dev_type = sockarr.getType(fd)
+
+            if name is None:
+                continue  # pomiń niezinicjalizowane urządzenia
+
+            # Jeśli urządzenie już istnieje, zaktualizuj dane
+            if name in self.devices:
+                device = self.devices[name]
+                device['fd'] = fd
+                device['type'] = TYPE_TO_NAME[dev_type]
+                device['sock'] = sock
+            else:
+                self.frame_seen.add_new_device({
+                    'name': name,
+                    'fd': fd,
+                    'type': TYPE_TO_NAME[dev_type],
+                    'sock': sock,
+                    'x': 1,       
+                    'y': 1,
+                    'floor': None,
+                })
+        if self.clear_buffer:
+            self.server.recv_queue.clear()
+        self.after(500, self.update_devices_from_sockarr)
+
 if __name__ == '__main__':
-    app = SmartHomeGUI()
+    server = Server()
+    thread = threading.Thread(target=server.main_loop, daemon=True)
+    thread.start()
+    app = SmartHomeGUI(server)
     app.mainloop()

@@ -4,12 +4,12 @@ from PIL import Image, ImageTk
 import socket
 import threading
 import io
+import time
 
 class CameraControlFrame(ttk.Frame):
     def __init__(self, container, dev, app, height=480, width=640):
         super().__init__(container, height=height, width=width)
         self.dev = dev
-        self.dev_ip = dev
         self.app = app
         self.width = width
         self.height = height
@@ -35,32 +35,33 @@ class CameraControlFrame(ttk.Frame):
 
         # Rozpocznij odbiór po TCP
         self.running = True
-        self.thread = threading.Thread(target=self.receive_tcp_stream, daemon=True)
-        self.thread.start()
+        self.app.clear_buffer = False
+        thread = threading.Thread(target=self.receive_commands_from_server, daemon=True)
+        thread.start()
 
-    def receive_tcp_stream(self):
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.connect((self.dev_ip, 12345)) 
-                self.status.config(text="Połączono z kamerą")
+    def receive_commands_from_server(self):
+        while self.running:
+            # Iteruj po wszystkich frame'ach w kolejce serwera
+            while self.app.server.recv_queue:
+                frame_info = self.app.server.recv_queue.pop(0)  # weź pierwszy
 
-                buffer = b""
-                while self.running:
-                    data = s.recv(4096)
-                    if not data:
-                        break
-                    buffer += data
+                # Sprawdź, czy ten frame jest dla device, który nas interesuje (np. po fd)
+                fd = frame_info['fd']
 
-                    if b"\xff\xd9" in buffer:
-                        end = buffer.index(b"\xff\xd9") + 2
-                        jpg_data = buffer[:end]
-                        buffer = buffer[end:]
+                if fd != self.dev['fd']:
+                    continue  # pomiń, jeśli nie dotyczy
+                if(frame_info['command'] == 3):
+                    data = frame_info['data']
 
-                        image = Image.open(io.BytesIO(jpg_data))
-                        self.update_image(image)
+                    # Pierwsze 4 bajty to długość ramki (big endian)
+                    size_bytes = data[:4]
+                    frame_size = int.from_bytes(size_bytes, byteorder='big')
 
-        except Exception as e:
-            self.status.config(text=f"Błąd: {e}")
+                    # JPEG 
+                    jpeg_data = data[4:4+frame_size]
+                    image = Image.open(io.BytesIO(jpeg_data))
+                    self.update_image(self, image)
+            time.sleep(0.06)
 
     def update_image(self, pil_image):
         # Przeskaluj z zachowaniem proporcji i centrowaniem
@@ -79,4 +80,5 @@ class CameraControlFrame(ttk.Frame):
 
     def destroy(self):
         self.running = False
+        self.app.clear_buffer = True
         super().destroy()

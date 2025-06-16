@@ -44,15 +44,6 @@ class MainFrame(ttk.Frame):
         ttk.Label(self.sidebar, text="Wszystkie urządzenia:", anchor="center", background="#add8e6").pack(pady=10)
         self.create_scrollable_device_list("Blue.TFrame")
 
-
-        ttk.Label(self.sidebar, text="Dodaj urządzenie:").pack(pady=(10,2))
-        self.new_dev_name = tk.StringVar()
-        self.new_dev_type = tk.StringVar(value="bulb")
-
-        ttk.Entry(self.sidebar, textvariable=self.new_dev_name).pack(padx=5)
-        ttk.OptionMenu(self.sidebar, self.new_dev_type, "bulb", *ICON_PATHS.keys()).pack(padx=5, pady=2)
-        ttk.Button(self.sidebar, text="Dodaj", command=self.add_new_device).pack(pady=5)
-
         nav_frame = ttk.Frame(self.sidebar)
         nav_frame.pack(pady=10)
         ttk.Button(nav_frame, text="Piętro ↑", command=self.go_up_floor).pack(side="left", padx=5)
@@ -234,16 +225,12 @@ class MainFrame(ttk.Frame):
             name = f"Piętro {self.app.floor}"
         self.floor_label.config(text=f"Piętro: {name}")
 
-    def add_new_device(self):
-        name = self.new_dev_name.get().strip()
-        typ = self.new_dev_type.get()
-        if name and typ in ICON_PATHS:
-            dev = {"name": name, "type": typ, "x": 0.5, "y": 0.5, "floor": None}
-            self.app.devices.append(dev)
-            self.refresh_device_list()
-            self.draw_devices_on_canvas()
-            self.new_dev_name.set("")
-            self.app.save_layout_to_file("layout.json")
+    def add_new_device(self, dev):
+        self.app.devices.append(dev)
+        self.refresh_device_list()
+        self.draw_devices_on_canvas()
+        self.new_dev_name.set("")
+        self.app.save_layout_to_file("layout.json")
 
     def load_layout_from_file(self, filename):
         if os.path.exists(filename):
