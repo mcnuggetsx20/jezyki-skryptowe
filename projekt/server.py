@@ -61,31 +61,48 @@ def main_loop():
                 #     pass
 
                 data = b''
-                # 3, bo dajemy komende, typ, dlugosc nazwy
-                while len(data) < 3:
+                #najpierw odbieramy tylko typ komendy
+                while len(data) < 1:
                     packet = current_socket.recv(max_msg_size)
                     if not packet: break
                     data += packet
 
-                if len(data) < 3:
+                if len(data) < 1:
                     current_socket.close()
                     sockets.rmSocket(fd)
 
-                command, device_type,name_len = struct.unpack('BBB', data[:3])
-                device_name_packed = data[3:]
+                # command, device_type,name_len = struct.unpack('BBB', data[:3])
+                command = struct.unpack('B', data[:1])[0]
+                print(command)
 
-                while len(device_name_packed) < name_len:
-                    packet = current_socket.recv(max_msg_size)
-                    if not packet: break
-                    device_name_packed += packet
+                if command == COMMAND_IDENTIFY:
+                    while len(data) < 3:
+                        packet = current_socket.recv(max_msg_size)
+                        if not packet: break
+                        data += packet
 
-                if len(device_name_packed) < name_len:
-                    current_socket.close()
-                    sockets.rmSocket(fd)
+                    if len(data) < 3:
+                        current_socket.close()
+                        sockets.rmSocket(fd)
 
-                device_name = device_name_packed.decode('utf-8')
+                    device_type,name_len = struct.unpack('BB', data[1:3])
+                    device_name_packed = data[3:]
 
-                print(command, device_type, name_len, device_name)
+                    while len(device_name_packed) < name_len:
+                        packet = current_socket.recv(max_msg_size)
+                        if not packet: break
+                        device_name_packed += packet
+
+                    if len(device_name_packed) < name_len:
+                        current_socket.close()
+                        sockets.rmSocket(fd)
+
+                    device_name = device_name_packed.decode('utf-8')
+
+                    print(command, device_type, name_len, device_name)
+                
+                elif command = COMMAND_CAMERA_STREAM:
+                    hdlrs.camera_handler(fd, sockets, camera_payload_size)
 
 if __name__ == '__main__':
     port = 3490

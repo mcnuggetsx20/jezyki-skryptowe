@@ -39,7 +39,8 @@ if __name__ == '__main__':
             if cl.client_connected:
                 _, encoded = cv2.imencode('.jpg', frame)
                 data = encoded.tobytes()
-                cl.add_to_send(struct.pack('!I', len(data)) + data)
+                cl.add_to_send(struct.pack('B!I', 
+                    COMMAND_CAMERA_STREAM, len(data)) + data)
 
 
             cl.pollEvents(timeout=0)
