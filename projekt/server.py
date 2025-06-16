@@ -6,127 +6,130 @@ import numpy as np
 
 import collections
 import lib.SockArr as sa
-import lib.handlers as hdlrs
+import lib.handlers as hndlrs
 from lib.commands import *
 from lib.types import *
 
-def getBroadcastSocket(port) -> socket.socket:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, True)
-    sock.bind(('', port))
+class Server:
 
-    sock.setblocking(False)
-    return sock
+    def __init__(self):
+        self.port = 3490
+        self.MSG_FROM_SERVER = b'serverup'
 
-def getListeningSocket(port) -> socket.socket:
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        frame_times = collections.deque(maxlen=30) 
 
-    #zeby sie nie blokowalo, bo sa bugi czasem
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
-    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+        self.broadcastSocket = self.getBroadcastSocket(self.port)
+        self.serverSocket = self.getListeningSocket(self.port)
+        self.sockets = sa.SockArr()
 
-    sock.bind(('', port))
-    sock.listen()
+        self.sockets.addSocket(self.serverSocket)
 
-    return sock
+        # to jest sygnal ze se wstalismy
+        self.send_queue = list()
+        self.recv_queue = list()
 
-def main_loop():
-    while True:
-        events = sockets.poller.poll(1000) #1 sekunda
+        return
 
-        print('poll')
-        if not events: continue
+    def sendBroadcast(self):
+        self.broadcastSocket.sendto(self.MSG_FROM_SERVER, ('255.255.255.255', self.port))
+        return
 
-        for fd, event in events:
-            if not (event & select.POLLIN): continue
-            current_socket = sockets.getSocket(fd)
+    def getBroadcastSocket(self,port) -> socket.socket:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, True)
+        sock.bind(('', port))
 
-            if current_socket == serverSocket:
-                #mamy probe polaczenia
-                new_sock,_ = serverSocket.accept() #tu zamiast _ mozna zebrac adres
-                sockets.addSocket(new_sock)
-                print('registered a new client')
+        sock.setblocking(False)
+        return sock
 
-            else:
-                #jeden z klientow cos od nas chce
-                # if sockets.getId(fd) == None:
-                #     msg = current_socket.recv(10)
-                #     if msg:
-                #         sockets.setId(fd, msg)
-                #
-                # elif sockets.getId(fd) == b'cam':
-                #     hdlrs.camera_handler(fd, sockets, camera_payload_size)
-                #
-                # else:
-                #     pass
+    def getListeningSocket(self,port) -> socket.socket:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-                data = b''
-                #najpierw odbieramy tylko typ komendy
-                while len(data) < 1:
-                    packet = current_socket.recv(1)
-                    if not packet: break
-                    data += packet
+        #zeby sie nie blokowalo, bo sa bugi czasem
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, True)
+        sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
-                if len(data) < 1:
-                    current_socket.close()
-                    sockets.rmSocket(fd)
-                    continue
+        sock.bind(('', port))
+        sock.listen()
 
-                print(len(data))
-                command = struct.unpack('!B', data[:1])[0]
-                print(f'command {command}')
+        return sock
 
-                if command == COMMAND_IDENTIFY:
-                    while len(data) < 3:
-                        packet = current_socket.recv(max_msg_size)
-                        if not packet: break
-                        data += packet
+    def main_loop(self):
+        try:
+            while True:
+                events = self.sockets.poller.poll(1000) #1 sekunda
 
-                    if len(data) < 3:
-                        current_socket.close()
-                        sockets.rmSocket(fd)
+                # print('poll')
+                if not events: continue
 
-                    device_type,name_len = struct.unpack('!BB', data[1:3])
-                    device_name_packed = data[3:]
+                for fd, event in events:
+                    current_socket = self.sockets.getSocket(fd)
 
-                    while len(device_name_packed) < name_len:
-                        packet = current_socket.recv(max_msg_size)
-                        if not packet: break
-                        device_name_packed += packet
+                    if current_socket == self.serverSocket:
+                        if event & select.POLLIN:
+                            #mamy probe polaczenia
+                            new_sock,_ = self.serverSocket.accept() #tu zamiast _ mozna zebrac adres
+                            self.sockets.addSocket(new_sock, events= select.POLLIN | select.POLLOUT)
+                            print('registered a new client')
 
-                    if len(device_name_packed) < name_len:
-                        current_socket.close()
-                        sockets.rmSocket(fd)
+                    else:
+                        if event & select.POLLIN:
+                            #jeden z klientow cos od nas chce
+                            # if sockets.getId(fd) == None:
+                            #     msg = current_socket.recv(10)
+                            #     if msg:
+                            #         sockets.setId(fd, msg)
+                            #
+                            # elif sockets.getId(fd) == b'cam':
+                            #     hdlrs.camera_handler(fd, sockets, camera_payload_size)
+                            #
+                            # else:
+                            #     pass
 
-                    device_name = device_name_packed.decode('utf-8')
+                            data = b''
+                            #najpierw odbieramy tylko typ komendy
+                            while len(data) < 1:
+                                packet = current_socket.recv(1)
+                                if not packet: break
+                                data += packet
 
-                    print(command, device_type, name_len, device_name)
-                
-                elif command == COMMAND_CAMERA_STREAM:
-                    hdlrs.camera_handler(fd, sockets, camera_payload_size)
+                            if len(data) < 1:
+                                current_socket.close()
+                                self.sockets.rmSocket(fd)
+                                continue
+
+                            print(len(data))
+                            command = struct.unpack('!B', data[:1])[0]
+                            print(f'command {command}')
+
+                            if command == COMMAND_IDENTIFY:
+                                hndlrs.identify_handler(fd, self.sockets)
+                            
+                            elif command == COMMAND_CAMERA_STREAM:
+                                frame = hndlrs.camera_handler(fd, self.sockets)
+                                self.recv_queue.append({
+                                    'fd': fd,
+                                    'command': COMMAND_CAMERA_STREAM,
+                                    'data': frame,
+                                })
+
+        except KeyboardInterrupt:
+            cv2.destroyAllWindows()
+            self.serverSocket.close()
+            self.broadcastSocket.close()
+
+    def add_to_send(self, fd, data):
+        self.send_queue.append({
+            'fd': fd,
+            'data': data,
+        })
+
+        return
+    
 
 if __name__ == '__main__':
-    port = 3490
-    max_msg_size = 4096
-    MSG_FROM_SERVER = b'serverup'
-    MAX_FRAME_SIZE = 10**6
+    serv = Server()
 
-    frame_times = collections.deque(maxlen=30) 
+    serv.main_loop()
 
-    broadcastSocket = getBroadcastSocket(port)
-    serverSocket = getListeningSocket(port)
-    sockets = sa.SockArr()
 
-    sockets.addSocket(serverSocket)
-
-    # to jest sygnal ze se wstalismy
-    broadcastSocket.sendto(MSG_FROM_SERVER, ('255.255.255.255', port))
-
-    camera_payload_size = struct.calcsize('!I')
-
-    try:
-        main_loop()
-    except KeyboardInterrupt:
-        cv2.destroyAllWindows()
-        serverSocket.close()
-        broadcastSocket.close()

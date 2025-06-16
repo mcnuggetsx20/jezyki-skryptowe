@@ -46,6 +46,9 @@ class Client:
 
     def pollEvents(self, timeout = 1000):
 
+        # to jest funkcja ktora wykonuje jedna iteracje normalnej petli eventow
+        # wysyla self.send_queue (jesli socket tcp jest gotowy)
+
         if self.client_connected and self.send_queue:
             self.sockets.modSocket(self.clientSocket.fileno(), select.POLLOUT | select.POLLIN)
 
@@ -68,9 +71,10 @@ class Client:
 
                         id_bytes = self.identity.encode('utf-8')
                         msg = struct.pack('!BBB', COMMAND_IDENTIFY, self._type, len(id_bytes)) + id_bytes
+                        self.send_queue.append(msg) #informacja o tym kim jestesmy
 
-                        current_socket.send(msg) #informacja o tym kim jestesmy
-                    continue
+                        # current_socket.send(msg) #informacja o tym kim jestesmy
+                    # continue
 
                 if self.client_connected:
                     if event & select.POLLIN:
@@ -83,6 +87,10 @@ class Client:
                             else:
                                 # tutaj nam sie tcp rozlaczyl
                                 self.cleanup()
+                                continue
+
+                            command = struct.unpack('!B', data[:1])[0]
+                            #if command == COMMAND_STH
 
                         except BlockingIOError: pass
                         except (ConnectionResetError, ValueError):
@@ -90,11 +98,6 @@ class Client:
 
                     elif (event & select.POLLOUT) and self.send_queue:
 
-                        # header = self.send_queue[0]['header']
-                        # data = self.send_queue[0]['data']
-                        # format = self.send_queue[0]['format']
-
-                        # data_to_send = struct.pack(format, header, len(data)) + data
                         data_to_send = self.send_queue[0]
 
                         bytes_sent = current_socket.send(data_to_send)
@@ -136,17 +139,17 @@ class Client:
 
     def add_to_send(self, data):
         self.send_queue.append(data)
-        # self.send_queue.append({
-        #     'header': header,
-        #     'data' : data,
-        #     'format': format
-        #     })
 
     def cleanup(self):
+
+        #ta funkcja rozlacza socket tcp i czysci co trzeba,
+        # uzywac zawsze kiedy tcp sie wywala
+
         self.sockets.rmSocket(self.clientSocket.fileno())
         self.clientSocket.close()
         self.client_connected = False
         self.send_queue = list()
+        return
 
     def prepare(self):
         # self.clientSocket = self.getClientSocket(self.PORT)
