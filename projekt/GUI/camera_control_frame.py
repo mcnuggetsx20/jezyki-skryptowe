@@ -14,7 +14,7 @@ class CameraControlFrame(ttk.Frame):
         self.width = width
         self.height = height
 
-        self.canvas = tk.Canvas(self, width=width, height=height, bg="black")
+        self.canvas = tk.Canvas(self, bg="black")
         self.canvas.grid(row=0, column=0, sticky="nsew")
 
         self.sidebar = ttk.Frame(self)

@@ -7,6 +7,7 @@ import time
 import operator
 import socket
 
+
 # local imports
 from menu_bar import MenuBar
 from camera_control_frame import CameraControlFrame
@@ -52,7 +53,7 @@ class SmartHomeGUI(tk.Tk):
         self.menu_option = MenuBar(self.container, self, height=20)
 
         # Wyswietlanie pierwsze MainFrame
-        self.frame_seen = MainFrame(self.container, self)
+        self.frame_seen = MainFrame(self.container, self, height=800, width=768)
         self.main_frame = self.frame_seen
 
     def open_device_panel(self, device):
@@ -83,13 +84,13 @@ class SmartHomeGUI(tk.Tk):
         return
     
     def go_to_menu(self):
-        # Ukryj panel urządzenia
+        # Usuwanie panelu urzadzenia
         if hasattr(self, 'device_panel') and self.device_panel:
             self.device_panel.pack_forget()
             self.device_panel.destroy()
             self.device_panel = None
 
-        # Pokaż z powrotem main_frame
+        # Showing main frame
         if self.main_frame:
             self.main_frame.pack(fill="both", expand=True)
 

@@ -20,7 +20,7 @@ class MainFrame(ttk.Frame):
         self.loaded_background_images = {}
         self.dragging_device = None
         self.clicked_device = None
-        self.main_frame = None  # Dodane na potrzeby open_device_panel
+        self.main_frame = None  
         self.canvas_width = 800
         self.canvas_height = 768
 
@@ -38,12 +38,12 @@ class MainFrame(ttk.Frame):
         style = ttk.Style()
         style.configure("Blue.TFrame", background="#add8e6")
 
-        self.sidebar = ttk.Frame(self, width=210, style="Blue.TFrame")
+        self.sidebar = ttk.Frame(self, width=230, style="Blue.TFrame")
         self.sidebar.pack(side="right", fill="y", expand=False)
 
         ttk.Label(self.sidebar, text="Wszystkie urządzenia:", anchor="center", background="#add8e6").pack(pady=10)
-        self.device_list_frame = ttk.Frame(self.sidebar, style="Blue.TFrame")
-        self.device_list_frame.pack(fill="both", expand=False)
+        self.create_scrollable_device_list("Blue.TFrame")
+
 
         ttk.Label(self.sidebar, text="Dodaj urządzenie:").pack(pady=(10,2))
         self.new_dev_name = tk.StringVar()
@@ -66,8 +66,35 @@ class MainFrame(ttk.Frame):
         self.canvas.bind("<ButtonRelease-1>", self.on_canvas_left_release)
         self.canvas.bind("<Button-3>", self.on_canvas_right_click)
 
+        self.bind("<Configure>", self.on_resize)
+        
+        self.update_idletasks()
+        self.canvas_width = self.canvas.winfo_width()
+        self.canvas_height = self.canvas.winfo_height()
+
         self.refresh_device_list()
         self.draw_devices_on_canvas()
+
+    def create_scrollable_device_list(self, style):
+        container = ttk.Frame(self.sidebar)
+        container.pack(fill="both", expand=True)
+
+        canvas = tk.Canvas(container, bg="#add8e6", highlightthickness=0, width=210)
+        scrollbar = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+        self.device_list_frame = ttk.Frame(canvas, style=style)
+
+        self.device_list_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+
+        canvas.create_window((0, 0), window=self.device_list_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="y", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        self.device_canvas = canvas
+
 
     def load_icons(self):
         for name, path in ICON_PATHS.items():
@@ -237,3 +264,11 @@ class MainFrame(ttk.Frame):
         self.update_floor_label()
         self.refresh_device_list()
         self.draw_devices_on_canvas()
+    
+    def on_resize(self, event):
+        if event.widget == self:
+            self.update_idletasks()
+            self.canvas_width = self.canvas.winfo_width()
+            self.canvas_height = self.canvas.winfo_height()
+
+            self.draw_devices_on_canvas()
