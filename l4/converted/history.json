@@ -1,0 +1,121 @@
+[
+    {
+        "time": "2025-04-03 11:16:49.129891",
+        "original path": "/home/mcnuggetsx20/Documents/coding/studia/sem4/js/lab/l4/media/01 - Alice In Chains - Them Bones.flac",
+        "output format": "mp3",
+        "output path": "/home/mcnuggetsx20/Documents/coding/studia/sem4/js/lab/l4/converted/20250403-01 - Alice In Chains - Them Bones.mp3"
+    },
+    {
+        "time": "2025-04-03 11:18:05.547628",
+        "original path": "/home/mcnuggetsx20/Documents/coding/studia/sem4/js/lab/l4/media/01 - Alice In Chains - Them Bones.flac",
+        "output format": "mp3",
+        "output path": "/home/mcnuggetsx20/Documents/coding/studia/sem4/js/lab/l4/converted/20250403-01 - Alice In Chains - Them Bones.mp3"
+    },
+    {
+        "time": "2025-04-03 11:18:08.502777",
+        "original path": "/home/mcnuggetsx20/Documents/coding/studia/sem4/js/lab/l4/media/04.flac",
+        "output format": "mp3",
+        "output path": "/home/mcnuggetsx20/Documents/coding/studia/sem4/js/lab/l4/converted/20250403-04.mp3"
+    },
+    {
+        "time": "2025-04-03 11:18:11.461412",
+        "original path": "/home/mcnuggetsx20/Documents/coding/studia/sem4/js/lab/l4/media/03.flac",
+        "output format": "mp3",
+        "output path": "/home/mcnuggetsx20/Documents/coding/studia/sem4/js/lab/l4/converted/20250403-03.mp3"
+    },
+    {
+        "time": "2025-04-03 11:18:14.423581",
+        "original path": "/home/mcnuggetsx20/Documents/coding/studia/sem4/js/lab/l4/media/02.flac",
+        "output format": "mp3",
+        "output path": "/home/mcnuggetsx20/Documents/coding/studia/sem4/js/lab/l4/converted/20250403-02.mp3"
+    },
+    {
+        "time": "2025-04-06 20:23:09.134377",
+        "original path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/media/01 - Alice In Chains - Them Bones.flac",
+        "output format": "mp3",
+        "output path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/converted/20250406-01 - Alice In Chains - Them Bones.mp3"
+    },
+    {
+        "time": "2025-04-06 20:48:30.599866",
+        "original path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/media/01 - Alice In Chains - Them Bones.flac",
+        "output format": "mp4",
+        "output path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/converted/20250406-01 - Alice In Chains - Them Bones.mp4"
+    },
+    {
+        "time": "2025-04-06 20:49:17.978249",
+        "original path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/media/01 - Alice In Chains - Them Bones.flac",
+        "output format": "mp4",
+        "output path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/converted/20250406-01 - Alice In Chains - Them Bones.mp4",
+        "used program": "ffmpeg"
+    },
+    {
+        "time": "2025-04-06 20:57:30.251161",
+        "original path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/media/01 - Alice In Chains - Them Bones.flac",
+        "output format": "mp4",
+        "output path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/converted/20250406-01 - Alice In Chains - Them Bones.mp4",
+        "used program": "ffmpeg"
+    },
+    {
+        "time": "2025-04-06 20:58:31.805585",
+        "original path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/media/01 - Alice In Chains - Them Bones.flac",
+        "output format": "mp4",
+        "output path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/converted/20250406-01 - Alice In Chains - Them Bones.mp4",
+        "used program": "ffmpeg"
+    },
+    {
+        "time": "2025-04-06 21:00:25.066797",
+        "original path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/media/01 - Alice In Chains - Them Bones.flac",
+        "output format": "mp4",
+        "output path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/converted/20250406-01 - Alice In Chains - Them Bones.mp4",
+        "used program": "ffmpeg"
+    },
+    {
+        "time": "2025-04-06 21:00:25.246496",
+        "original path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/media/image.png",
+        "output format": "mp4",
+        "output path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/converted/20250406-image.mp4",
+        "used program": "ffmpeg"
+    },
+    {
+        "time": "2025-04-06 21:01:42.050901",
+        "original path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/media/01 - Alice In Chains - Them Bones.flac",
+        "output format": "mp4",
+        "output path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/converted/20250406-01 - Alice In Chains - Them Bones.mp4",
+        "used program": "ffmpeg"
+    },
+    {
+        "time": "2025-04-06 21:01:42.123020",
+        "original path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/media/image.png",
+        "output format": "png",
+        "output path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/converted/20250406-image.png",
+        "used program": "imagemagick"
+    },
+    {
+        "time": "2025-04-06 21:02:24.375531",
+        "original path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/media/01 - Alice In Chains - Them Bones.flac",
+        "output format": "mp3",
+        "output path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/converted/20250406-01 - Alice In Chains - Them Bones.mp3",
+        "used program": "ffmpeg"
+    },
+    {
+        "time": "2025-04-06 21:02:24.414231",
+        "original path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/media/image.png",
+        "output format": "jpg",
+        "output path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/converted/20250406-image.jpg",
+        "used program": "imagemagick"
+    },
+    {
+        "time": "2025-04-06 21:02:46.020149",
+        "original path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/media/image.png",
+        "output format": "--image",
+        "output path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/converted/20250406-image.--image",
+        "used program": "imagemagick"
+    },
+    {
+        "time": "2025-04-06 21:02:58.028955",
+        "original path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/media/image.png",
+        "output format": "jpg",
+        "output path": "/home/kac/studia/python_syf/jezyki-skryptowe/l4/converted/20250406-image.jpg",
+        "used program": "imagemagick"
+    }
+]
