@@ -1,14 +1,11 @@
 import select
 
-from . import handlers
-
 class SockArr:
     def __init__(self):
         self.sock_dct = dict()
         self.poller = select.poll()
 
-        self.id = 'None'
-        self.handlers = dict()
+        self.ids = dict()
 
         return
 
@@ -27,8 +24,6 @@ class SockArr:
         del self.sock_dct[fd]
         self.poller.unregister(fd)
 
-        if fd in self.handlers.keys():
-            self.handlers[fd] = None
         return
 
     def modSocket(self, fd, events):
@@ -36,9 +31,9 @@ class SockArr:
         return
 
     def setId(self, fd, id):
-        self.handlers[fd] = handlers.handler_dict.get(id, handlers.empty_handler)
+        self.ids[fd] = id
         return
 
-    def getHandler(self, fd):
-        return self.handlers.get(fd, handlers.empty_handler)
+    def getId(self, fd):
+        return self.ids.get(fd, None)
         

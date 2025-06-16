@@ -7,6 +7,7 @@ import numpy as np
 
 import collections
 import lib.SockArr as sa
+import lib.handlers
 
 def getBroadcastSocket(port) -> socket.socket:
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -48,7 +49,16 @@ def main_loop():
 
             else:
                 #jeden z klientow cos od nas chce
-                sockets.getHandler(fd)(fd, sockets, camera_payload_size)
+                if sockets.getId(fd) == None:
+                    msg, _ = current_socket.recv(10)
+                    if msg:
+                        sockets.setId(fd, msg)
+
+                elif sockets.getId(fd) == b'cam':
+                    handlers.camera_handler(fd, sockets, camera_payload_size)
+
+                else:
+                    pass
 
 
 

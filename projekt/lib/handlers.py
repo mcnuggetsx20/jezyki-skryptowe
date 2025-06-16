@@ -2,6 +2,7 @@ import socket
 import struct
 import cv2
 import numpy as np
+from collections import defaultdict
 
 def empty_handler():
     pass
@@ -54,8 +55,3 @@ def camera_handler(fd, sockets, camera_payload_size,
     cv2.waitKey(1)
 
     return
-
-handler_dict = {
-    'cam' : camera_handler,
-    'led' : None,
-}
