@@ -133,7 +133,6 @@ class Client:
         return
 
     def add_to_send(self, data, header, format):
-        self.send_queue.append(data)
         self.send_queue.append({
             'header': header,
             'data' : data,
