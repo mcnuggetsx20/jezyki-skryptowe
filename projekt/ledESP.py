@@ -30,13 +30,16 @@ class LedESP:
         self.holiday_mode = False
 
         self.recv_buffer = bytearray()
+        self.holiday_mode_num = 0
     
+    def remember_color(self,r,g,b):
+        self.rgb = (r, g, b)
+
     def change_color(self, r, g, b):
         # Zakładam, że PWM 10-bit (0-1023), jasność skaluje odwrotnie (zależne od LED - jeśli odwrócone, zmień)
         self.pwm_r.duty(int((r / 255) * 1023))
         self.pwm_g.duty(int((g / 255) * 1023))
         self.pwm_b.duty(int((b / 255) * 1023))
-        self.rgb = (r, g, b)
     
     def toggle_led(self):
         self.led_on = not self.led_on
@@ -62,6 +65,7 @@ class LedESP:
             r, g, b = msg[1], msg[2], msg[3]
             print(f"Komenda SET_COLOR: R={r}, G={g}, B={b}")
             self.change_color(r, g, b)
+            self.remember_color(r, g, b)
         
         elif cmd == CMD_TOGGLE_ON_OFF:
             print("Komenda TOGGLE_ON_OFF")
@@ -108,7 +112,10 @@ class LedESP:
             self.handle_command(full_cmd)
 
     def handle_events(self):
-        return
+        
+        if self.holiday_mode:
+            self.change_color(self.rgb[self.holiday_mode_num%3], self.rgb[(self.holiday_mode_num+1)%3],self.rgb[(self.holiday_mode_num+2)%3])
+            self.holiday_mode_num = (self.holiday_mode_num+1)%3
 
 if __name__ == '__main__':
     led_esp = LedESP()
@@ -121,17 +128,17 @@ if __name__ == '__main__':
             try:
                 cl.pollEvents(timeout=0)
             except Exception as e:
-                print("Błąd w pollEvents():", e)
-                print("Restartuję klienta...")
+                print("Bład w pollEvents():", e)
+                print("Restartuje klienta...")
                 try:
                     cl.cleanup()
                 except Exception as e2:
-                    print("Błąd podczas cleanup():", e2)
+                    print("Bład podczas cleanup():", e2)
                 time.sleep(1)
                 try:
                     cl.prepare()
                 except Exception as e3:
-                    print("Błąd podczas prepare():", e3)
+                    print("Bład podczas prepare():", e3)
                     machine.reset()
 
             time.sleep(0.05)

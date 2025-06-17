@@ -82,11 +82,20 @@ class Client:
                 if self.client_connected:
                     if event & select.POLLIN:
                         try:
-                            msg = current_socket.recv(self.MSG_SIZE)
+                            msg, _ = current_socket.recv(self.MSG_SIZE)
                             data = b''
-                            if msg:
-                                if self.input_handler:
-                                    self.input_handler.handle_data(msg)
+                            #najpierw odbieramy tylko typ komendy
+                            while len(data) < 1:
+                                packet = current_socket.recv(1)
+                                if not packet: break
+                                data += packet
+
+                            if len(data) < 1:
+                                self.cleanup()
+                                continue
+
+                            command = struct.unpack('!B', data[:1])[0]
+                            #if command == COMMAND_STH
 
                                 # tutaj nam sie tcp rozlaczyl
                         except Exception as e:
@@ -150,7 +159,6 @@ class Client:
 
     def prepare(self):
         # self.clientSocket = self.getClientSocket(self.PORT)
-
         # self.sockets.addSocket(self.clientSocket)
         self.discovery_socket = self.getDgramSocket(self.PORT)
         self.sockets.addSocket(self.discovery_socket)
