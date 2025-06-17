@@ -22,13 +22,21 @@ class Server:
         self.serverSocket = self.getListeningSocket(self.port)
         self.sockets = sa.SockArr()
 
-        self.sockets.addSocket(self.serverSocket)
+        self.sockets.addSocket(self.serverSocket, None)
 
         # to jest sygnal ze se wstalismy
         self.send_queue = list()
         self.recv_queue = list()
 
+        # UDP do wysylania komend
+        self.udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.udp_socket.bind(('', self.port+1))
+        self.udp_socket.setblocking(False)
+
         return
+
+    def send_to_client(self, client_addr, data):
+        self.udp_socket.sendto(data, (client_addr, 3501))
 
     def sendBroadcast(self):
         self.broadcastSocket.sendto(self.MSG_FROM_SERVER, ('255.255.255.255', 3490))
@@ -68,8 +76,8 @@ class Server:
                     if current_socket == self.serverSocket:
                         if event & select.POLLIN:
                             #mamy probe polaczenia
-                            new_sock,_ = self.serverSocket.accept() #tu zamiast _ mozna zebrac adres
-                            self.sockets.addSocket(new_sock, events= select.POLLIN | select.POLLOUT)
+                            new_sock, address = self.serverSocket.accept() #tu zamiast _ mozna zebrac adres
+                            self.sockets.addSocket(new_sock, address, events= select.POLLIN | select.POLLOUT)
                             print('registered a new client')
 
                     else:

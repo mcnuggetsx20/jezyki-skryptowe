@@ -9,7 +9,7 @@ class SockArr:
 
         # self.props = defaultdict(lambda: {'type': None, 'name' : None})
         self.props = dict()
-        self.default_value = {'type': None, 'name' : None}
+        self.default_value = {'type': None, 'name' : None, 'ip': None}
 
         return
 
@@ -17,10 +17,14 @@ class SockArr:
         # print(f'get{fd}')
         return self.sock_dct[fd]
 
-    def addSocket(self, sock, events = select.POLLIN):
+    def addSocket(self, sock, address = None ,events = select.POLLIN):
         print(f'add {sock.fileno()}')
         self.poller.register(sock, events)
         self.sock_dct[sock.fileno()] = sock
+        if sock.fileno() not in self.props.keys():
+            self.props[sock.fileno()] = self.default_value
+        if address:
+            self.props[sock.fileno()]['ip'] = address[0]
         return
 
     def rmSocket(self, fd):
@@ -43,6 +47,9 @@ class SockArr:
 
     def getType(self, fd):
         return self.props[fd]['type'] if fd in self.props.keys() else None
+    
+    def getIP(self, fd):
+        return self.props[fd]['ip'] if fd in self.props.keys() else None
 
     def setName(self, fd, name):
         if fd not in self.props.keys():

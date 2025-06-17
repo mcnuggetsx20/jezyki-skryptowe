@@ -13,6 +13,7 @@ import threading
 from menu_bar import MenuBar
 from camera_control_frame import CameraControlFrame
 from main_frame import MainFrame
+from bulb_control_frame import BulbControlFrame
 
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -76,13 +77,22 @@ class SmartHomeGUI(tk.Tk):
             self.frame_seen.pack_forget() 
         
         # Panel urządzenia
-        self.device_panel = CameraControlFrame(
-            container=self.container,
-            dev=device,
-            app=self,
-            height=768,
-            width=1024
-        )
+        if device['type'] == '1':
+            self.device_panel = CameraControlFrame(
+                container=self.container,
+                dev=device,
+                app=self,
+                height=768,
+                width=1024
+            )
+        else:
+            self.device_panel = BulbControlFrame(
+                container=self.container,
+                dev=device,
+                app=self,
+                height=768,
+                width=1024
+            )
         self.device_panel.pack(fill="both", expand=True)
     
     def save_layout_to_file(self, filename):
@@ -120,6 +130,7 @@ class SmartHomeGUI(tk.Tk):
         for fd, sock in sockarr.sock_dct.items():
             name = sockarr.getName(fd)
             dev_type = sockarr.getType(fd)
+            ip = sockarr.getIP(fd)
 
             if name is None:
                 continue  # pomiń niezinicjalizowane urządzenia
@@ -132,6 +143,7 @@ class SmartHomeGUI(tk.Tk):
                 device['fd'] = fd
                 device['type'] = TYPE_TO_NAME[dev_type]
                 device['sock'] = sock
+                device['ip'] = ip
             else:
                 # Dodaj nowe urządzenie
                 self.frame_seen.add_new_device({
@@ -142,6 +154,7 @@ class SmartHomeGUI(tk.Tk):
                     'x': 1,
                     'y': 1,
                     'floor': None,
+                    'ip': ip
                 })
         if self.clear_buffer:
             self.server.recv_queue.clear()
