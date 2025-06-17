@@ -77,7 +77,7 @@ class SmartHomeGUI(tk.Tk):
             self.frame_seen.pack_forget() 
         
         # Panel urządzenia
-        if device['type'] == '1':
+        if device['type'] == 'camera':
             self.device_panel = CameraControlFrame(
                 container=self.container,
                 dev=device,
