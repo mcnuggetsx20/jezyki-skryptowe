@@ -39,6 +39,8 @@ class CameraControlFrame(ttk.Frame):
         self.app.clear_buffer = False
         thread = threading.Thread(target=self.receive_commands_from_server, daemon=True)
         thread.start()
+        self.tk_image = None
+        self.after(50, self.update_now)
 
     def receive_commands_from_server(self):
         while self.running:
@@ -50,7 +52,6 @@ class CameraControlFrame(ttk.Frame):
                 fd = frame_info['fd']
 
                 if fd != self.dev['fd']:
-                    print("kurwaaaaaaa")
                     print(fd)
                     print(self.dev['fd'])
                     continue  # pomiń, jeśli nie dotyczy
@@ -91,8 +92,12 @@ class CameraControlFrame(ttk.Frame):
         y = (canvas_h - new_h) // 2
 
         self.canvas.coords(self.image_on_canvas, x, y)
-        self.canvas.itemconfig(self.image_on_canvas, image=self.tk_image)
 
+    def update_now(self):
+        if self.running:
+            self.image_for_now = self.tk_image
+            self.canvas.itemconfig(self.image_on_canvas, image=self.image_for_now)
+            self.after(50, self.update_now)
 
     def destroy(self):
         self.running = False

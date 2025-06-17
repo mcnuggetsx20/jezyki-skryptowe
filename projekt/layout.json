@@ -1,0 +1,43 @@
+{
+  "floors": 1,
+  "floor_names": [
+    "Pietro 0"
+  ],
+  "devices": [
+    {
+      "name": "kamerka",
+      "fd": 8,
+      "type": "camera",
+      "x": 0.3740648379052369,
+      "y": 0.3418918918918919,
+      "floor": "Pietro 0"
+    },
+    {
+      "name": "led1234",
+      "fd": 4,
+      "type": "bulb",
+      "x": 0.41271820448877805,
+      "y": 0.6472972972972973,
+      "floor": "Pietro 0",
+      "ip": "192.168.4.1"
+    },
+    {
+      "name": "led223",
+      "fd": 8,
+      "type": "bulb",
+      "x": 1,
+      "y": 1,
+      "floor": null
+    },
+    {
+      "name": "led_kitchen",
+      "fd": 4,
+      "type": "bulb",
+      "x": 1,
+      "y": 1,
+      "floor": null,
+      "ip": "192.168.0.104"
+    }
+  ],
+  "backgrounds": {}
+}
