@@ -15,7 +15,7 @@ class Client:
         self.serverInfo = (None, None)
         self.sockets = sa.SockArr()
         self.client_connected = False
-
+        self.input_handler = input_handler
         self.send_queue = list()
         self.identity = identity
         self._type = tp
@@ -24,7 +24,9 @@ class Client:
         self.PORT = 3490
         self.MSG_FROM_SERVER = b'serverup'
 
-        return;
+        self.COMMAND_PORT = 3501
+
+        return
 
     def getDgramSocket(self, port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -80,14 +82,14 @@ class Client:
                 if self.client_connected:
                     if event & select.POLLIN:
                         try:
-                            msg, _ = current_socket.recv(self.MSG_SIZE)
+                            msg = current_socket.recv(self.MSG_SIZE)
                             data = b''
                             if msg:
                                 if self.input_handler:
                                     self.input_handler.handle_data(msg)
 
                                 # tutaj nam sie tcp rozlaczyl
-                        except:
+                        except Exception as e:
                             self.cleanup()
 
                     elif (event & select.POLLOUT) and self.send_queue:
@@ -106,28 +108,29 @@ class Client:
                         if not self.send_queue:
                             self.sockets.modSocket(fd, select.POLLIN)
 
-            else:
+            elif current_socket == self.discovery_socket:
+                # odbieranie broadcastu / pakietów na 3490
+                try:
+                    msg, sender = current_socket.recvfrom(self.MSG_SIZE)
+                    if self.client_connected:
+                        continue
+                    if msg == self.MSG_FROM_SERVER:
+                        self.clientSocket = self.getClientSocket(self.PORT)
+                        try: self.clientSocket.connect(sender)
+                        except : pass
+                        self.sockets.addSocket(self.clientSocket, events=select.POLLOUT)
+                except:
+                    pass
 
-                # tutaj nasz socket udp cos zwrocil,
-                # my go uzywamy tylko do laczenia sie z serwerem
-                # wiec jesli nie potrzebujemy polaczenia 
-                # (bo np je juz mamy) to elo
-                print(f'udp enter')
-
-
-                print(f'udp recv')
-
-                msg, sender = current_socket.recvfrom(self.MSG_SIZE)
-                if self.client_connected: return
-
-                if msg == self.MSG_FROM_SERVER:
-                    self.clientSocket = self.getClientSocket(self.PORT)
-
-                    # tutaj tak trzeba bo mamy non-blocking na clientSocket
-                    try: self.clientSocket.connect(sender)
-                    except: pass
-
-                    self.sockets.addSocket(self.clientSocket, events=select.POLLOUT)
+            elif current_socket == self.command_socket:
+                # tu odbieramy komendy wysyłane przez serwer na port 3500
+                try:
+                    msg, sender = current_socket.recvfrom(self.MSG_SIZE)
+                    print(f"Received command from server {sender}: {msg}")
+                    # Tu możesz dodać obsługę komend - np. wywołać funkcję
+                    self.input_handler.handle_data(msg)
+                except :
+                    pass
 
         return
 
@@ -149,7 +152,12 @@ class Client:
         # self.clientSocket = self.getClientSocket(self.PORT)
 
         # self.sockets.addSocket(self.clientSocket)
-        self.sockets.addSocket(self.getDgramSocket(self.PORT))
+        self.discovery_socket = self.getDgramSocket(self.PORT)
+        self.sockets.addSocket(self.discovery_socket)
+
+        # UDP socket do odbioru poleceń
+        self.command_socket = self.getDgramSocket(self.COMMAND_PORT)
+        self.sockets.addSocket(self.command_socket)
 
 if __name__ == '__main__':
     client = Client(1,"led223")

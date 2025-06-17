@@ -85,7 +85,7 @@ class LedESP:
         while True:
             if len(self.recv_buffer) < 1:
                 return
-
+            
             cmd = self.recv_buffer[0]
 
             if cmd == CMD_SET_COLOR:
@@ -103,7 +103,7 @@ class LedESP:
                 return
 
             full_cmd = self.recv_buffer[:needed_len]
-            del self.recv_buffer[:needed_len]
+            self.recv_buffer = self.recv_buffer[needed_len:]
 
             self.handle_command(full_cmd)
 
@@ -117,9 +117,24 @@ if __name__ == '__main__':
 
     try:
         while True:
-
             led_esp.handle_events()
-            cl.pollEvents(timeout=0)
+            try:
+                cl.pollEvents(timeout=0)
+            except Exception as e:
+                print("Błąd w pollEvents():", e)
+                print("Restartuję klienta...")
+                try:
+                    cl.cleanup()
+                except Exception as e2:
+                    print("Błąd podczas cleanup():", e2)
+                time.sleep(1)
+                try:
+                    cl.prepare()
+                except Exception as e3:
+                    print("Błąd podczas prepare():", e3)
+                    machine.reset()
+
             time.sleep(0.05)
+
     except KeyboardInterrupt:
         cl.cleanup()
