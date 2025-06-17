@@ -8,16 +8,16 @@
       "name": "kamerka",
       "fd": 8,
       "type": "camera",
-      "x": 0.3740648379052369,
-      "y": 0.3418918918918919,
+      "x": 0.36783042394014964,
+      "y": 0.4648648648648649,
       "floor": "Pietro 0"
     },
     {
       "name": "led1234",
       "fd": 4,
       "type": "bulb",
-      "x": 0.41271820448877805,
-      "y": 0.6472972972972973,
+      "x": 0.6022443890274314,
+      "y": 0.4797297297297297,
       "floor": "Pietro 0",
       "ip": "192.168.4.1"
     },
@@ -39,5 +39,7 @@
       "ip": "192.168.0.104"
     }
   ],
-  "backgrounds": {}
+  "backgrounds": {
+    "0": "/home/kac/studia/python_syf/jezyki-skryptowe/projekt/icons/display.png"
+  }
 }

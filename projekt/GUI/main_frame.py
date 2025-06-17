@@ -135,8 +135,7 @@ class MainFrame(ttk.Frame):
     def draw_devices_on_canvas(self):
         self.canvas.delete("all")
         self.canvas.image_refs.clear()
-
-        bg_path = self.app.floor_backgrounds.get(self.app.floor)
+        bg_path = self.app.floor_backgrounds.get(str(self.app.floor))
         if bg_path and os.path.exists(bg_path):
             if self.app.floor not in self.loaded_background_images:
                 img = Image.open(bg_path).resize((self.canvas_width, self.canvas_height))
