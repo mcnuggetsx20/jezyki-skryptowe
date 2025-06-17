@@ -159,7 +159,7 @@ class Client:
         self.sockets.addSocket(self.getDgramSocket(self.PORT))
 
 if __name__ == '__main__':
-    client = Client()
+    client = Client(1,"led223")
     client.prepare()
     while True:
         client.pollEvents()

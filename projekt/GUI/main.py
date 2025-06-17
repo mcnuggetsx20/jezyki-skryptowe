@@ -25,9 +25,9 @@ ICON_PATHS = {
 }
 
 TYPE_TO_NAME = {
-    1: 'camera',
-    2: 'bulb',
-    3: 'display'
+    0: 'camera',
+    1: 'bulb',
+    2: 'display'
 }
 
 class SmartHomeGUI(tk.Tk):

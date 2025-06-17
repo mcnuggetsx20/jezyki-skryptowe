@@ -229,7 +229,6 @@ class MainFrame(ttk.Frame):
         self.app.devices.append(dev)
         self.refresh_device_list()
         self.draw_devices_on_canvas()
-        self.new_dev_name.set("")
         self.app.save_layout_to_file("layout.json")
 
     def load_layout_from_file(self, filename):
