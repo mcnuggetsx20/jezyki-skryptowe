@@ -124,7 +124,13 @@ class MainFrame(ttk.Frame):
     def on_device_list_right_click(self, event, dev):
         self.context_menu = tk.Menu(self, tearoff=0)
         self.context_menu.add_command(label="Add to floor", command=lambda dev=dev: self.add_to_floor_device(dev))
+        self.context_menu.add_command(label="Remove", command=lambda dev=dev: self.remove_device(dev))
         self.context_menu.tk_popup(event.x_root, event.y_root)
+
+    def remove_device(self, dev):
+        self.app.devices.remove(dev)
+        self.refresh_device_list()
+        self.draw_devices_on_canvas()
 
     def add_to_floor_device(self, dev):
         dev["x"] = 0.5
@@ -194,7 +200,8 @@ class MainFrame(ttk.Frame):
         dev = self.find_device_by_canvas_coords(event.x, event.y)
         if dev and dev["floor"] == self.app.floor_names[self.app.floor]:
             self.context_menu = tk.Menu(self, tearoff=0)
-            self.context_menu.add_command(label="Usuń z piętra", command=lambda dev=dev: self.remove_from_floor(dev))
+            self.context_menu.add_command(label="Do panelu sterowania", command=lambda dev=dev: self.app.open_device_panel(dev))
+            self.context_menu.add_command(label="Usun z pietra", command=lambda dev=dev: self.remove_from_floor(dev))
             self.context_menu.tk_popup(event.x_root, event.y_root)
 
     def remove_from_floor(self, dev):

@@ -113,12 +113,15 @@ class CameraControlFrame(ttk.Frame):
             self.after(50, self.update_now)
 
     def destroy(self):
+
         self.running = False
         self.app.clear_buffer = True
-        self.motion_var.set(False)
-        self.toggle_move_detection()
-        self.camera_stream.set(False)
-        self.toggle_camera_stream_detection()
+        try:
+            self.motion_var.set(False)
+            self.toggle_move_detection()
+            self.camera_stream.set(False)
+            self.toggle_camera_stream_detection()
+        except: pass
         super().destroy()
     
     def toggle_move_detection(self):
