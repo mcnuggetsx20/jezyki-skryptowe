@@ -86,14 +86,20 @@ class SmartHomeGUI(tk.Tk):
         self.device_panel.pack(fill="both", expand=True)
     
     def save_layout_to_file(self, filename):
+        devices_clean = []
+        for dev in self.devices:
+            dev_copy = {k: v for k, v in dev.items() if k != 'sock'}
+            devices_clean.append(dev_copy)
+
         data = {
             "floors": self.total_floors,
             "floor_names": self.floor_names,
-            "devices": self.devices,
+            "devices": devices_clean,
             "backgrounds": self.floor_backgrounds
         }
         with open(filename, "w") as f:
             json.dump(data, f, indent=2)
+
     
     def detect_devices_in_network(self):
         self.server.sendBroadcast()
@@ -105,7 +111,7 @@ class SmartHomeGUI(tk.Tk):
             self.device_panel.destroy()
             self.device_panel = None
 
-        # Showing main frame
+        # Pokaz glownego frame
         if self.main_frame:
             self.main_frame.pack(fill="both", expand=True)
 
@@ -118,19 +124,22 @@ class SmartHomeGUI(tk.Tk):
             if name is None:
                 continue  # pomiń niezinicjalizowane urządzenia
 
-            # Jeśli urządzenie już istnieje, zaktualizuj dane
-            if name in self.devices:
-                device = self.devices[name]
+            # Znajdź urządzenie w liście po nazwie
+            device = next((d for d in self.devices if d['name'] == name), None)
+
+            if device:
+                # Aktualizuj istniejące urządzenie
                 device['fd'] = fd
                 device['type'] = TYPE_TO_NAME[dev_type]
                 device['sock'] = sock
             else:
+                # Dodaj nowe urządzenie
                 self.frame_seen.add_new_device({
                     'name': name,
                     'fd': fd,
                     'type': TYPE_TO_NAME[dev_type],
                     'sock': sock,
-                    'x': 1,       
+                    'x': 1,
                     'y': 1,
                     'floor': None,
                 })

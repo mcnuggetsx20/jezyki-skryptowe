@@ -82,22 +82,13 @@ class Client:
                         try:
                             msg, _ = current_socket.recv(self.MSG_SIZE)
                             data = b''
-                            #najpierw odbieramy tylko typ komendy
-                            while len(data) < 1:
-                                packet = current_socket.recv(1)
-                                if not packet: break
-                                data += packet
+                            if msg:
+                                if self.input_handler:
+                                    self.input_handler.handle_data(msg)
 
-                            if len(data) < 1:
-                                self.cleanup()
-                                continue
-
-                            command = struct.unpack('!B', data[:1])[0]
-                            #if command == COMMAND_STH
-
-                        except (ConnectionResetError, ValueError):
+                                # tutaj nam sie tcp rozlaczyl
+                        except:
                             self.cleanup()
-                        except: pass
 
                     elif (event & select.POLLOUT) and self.send_queue:
 
@@ -165,5 +156,6 @@ if __name__ == '__main__':
     client.prepare()
     while True:
         client.pollEvents()
+
 
 
