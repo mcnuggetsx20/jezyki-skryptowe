@@ -120,6 +120,12 @@ class Server:
                                     'command': COMMAND_CAMERA_STREAM,
                                     'data': frame,
                                 })
+                            elif command == COMMAND_CAMERA_MOVE_DETECTED:
+                                self.recv_queue.append({
+                                    'fd': fd,
+                                    'command': COMMAND_CAMERA_MOVE_DETECTED,
+                                    'data': None,
+                                })
 
         except KeyboardInterrupt:
             cv2.destroyAllWindows()

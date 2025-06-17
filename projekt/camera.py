@@ -1,9 +1,26 @@
 import cv2
 import client
 import struct
-
+import time
 from lib.types import *
 from lib.commands import *
+
+STREAMING = True
+MOVE_DETECTION = True
+
+class CameraCMDHandler:
+    def __init__():
+        return
+
+    def handle_data(self, msg):
+        if COMMAND_CAMERA_STREAM_OFF_ONN == msg[0]:
+            STREAMING = bool(msg[1])
+        
+        elif COMMAND_CAMERA_MOVE_DETECTED_OFF_ONN == msg[0]:
+            MOVE_DETECTION = bool(msg[1])
+
+
+
 
 def getCam(device : int | str = 0) -> tuple[cv2.VideoCapture, int, int]:
     camera = cv2.VideoCapture(device)
@@ -56,24 +73,21 @@ if __name__ == '__main__':
             if not ret:
                 raise Exception("Failed to read frame!")
 
-            if detect_motion(prev_frame, frame):
+            if MOVE_DETECTION and detect_motion(prev_frame, frame):
                 print('byl ruch!')
+                if cl.client_connected:
+                    cl.add_to_send(struct.pack('!B', COMMAND_CAMERA_MOVE_DETECTED))
 
             prev_frame = frame
-
-            if cl.client_connected:
+            if cl.client_connected and STREAMING:
                 _, encoded = cv2.imencode('.jpg', frame)
                 data = encoded.tobytes()
                 cl.add_to_send(struct.pack('!BI', 
                     COMMAND_CAMERA_STREAM, len(data)) + data)
-                # cl.add_to_send(
-                #     header=COMMAND_CAMERA_STREAM,
-                #     data = data,
-                #     format = '!BI'
-                # )
 
 
             cl.pollEvents(timeout=0)
+            time.sleep(0.05)
     except KeyboardInterrupt:
         camera.release()
         cv2.destroyAllWindows()

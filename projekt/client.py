@@ -8,12 +8,12 @@ from lib.commands import *
 from lib.types import *
 
 class Client:
-    def __init__(self, tp, identity):
+    def __init__(self, tp, identity, input_handler=None):
         self.clientSocket = None
         self.serverInfo = (None, None)
         self.sockets = sa.SockArr()
         self.client_connected = False
-
+        self.input_handler = input_handler
         self.send_queue = list()
         self.identity = identity
         self._type = tp
@@ -135,7 +135,7 @@ class Client:
                     msg, sender = current_socket.recvfrom(self.MSG_SIZE)
                     print(f"Received command from server {sender}: {msg}")
                     # Tu możesz dodać obsługę komend - np. wywołać funkcję
-                    print(msg)
+                    self.input_handler.handle_data(msg)
                 except BlockingIOError:
                     pass
 
